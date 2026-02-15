@@ -1,6 +1,6 @@
 package model;
 
-import java.util.EventObject;;
+import java.util.EventObject;
 
 public class OrbitoBoardChangedEvent extends EventObject {
     public OrbitoBoardChangedEvent(Object source) {

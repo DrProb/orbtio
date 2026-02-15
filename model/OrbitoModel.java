@@ -5,7 +5,10 @@ public class OrbitoModel {
     OrbitoStone[][] board;
     int currentPlayerIdx = 0;
     boolean currentPlayerHasMoved = false;
-    private java.util.List<OrbitoBoardChangedListener> boardChangedListeners = new java.util.ArrayList<>();
+    boolean outOfStones = false;
+    int outOfStonesOrbitoButtonCounter = 0;
+    private java.util.List<OrbitoModelListener> modelListeners = new java.util.ArrayList<>();
+    private boolean gameEnded = false;
 
     public OrbitoModel() {
         this.board = new OrbitoStone[4][4];
@@ -14,14 +17,21 @@ public class OrbitoModel {
         player[1] = new Player("Spieler 2", OrbitoStoneColor.BLACK);
     }
 
-    public void addBoardChangedListener(OrbitoBoardChangedListener listener) {
-        boardChangedListeners.add(listener);
+    public void addBoardChangedListener(OrbitoModelListener listener) {
+        modelListeners.add(listener);
     }
 
     void notifyBoardChanged() {
         OrbitoBoardChangedEvent event = new OrbitoBoardChangedEvent(this);
-        for (OrbitoBoardChangedListener listener : boardChangedListeners) {
+        for (OrbitoModelListener listener : modelListeners) {
             listener.boardChanged(event);
+        }
+    }
+
+    void notifyGameEnded() {
+        OrbitoGameEndedEvent event = new OrbitoGameEndedEvent(this);
+        for (OrbitoModelListener listener : modelListeners) {
+            listener.gameEnded(event);
         }
     }
 
@@ -55,7 +65,7 @@ public class OrbitoModel {
     }
 
     public void pushOrbitoButton() {
-        if (!currentPlayerHasMoved) {
+        if (!outOfStones && !currentPlayerHasMoved) {
             throw new IllegalArgumentException("Current player has not moved!");
         }
 
@@ -89,6 +99,109 @@ public class OrbitoModel {
         currentPlayerIdx = (currentPlayerIdx + 1) % 2;
         currentPlayerHasMoved = false;
         notifyBoardChanged();
+        checkForFourInARow();
+
+        if (!outOfStones) {
+            checkForNoMoreStones();
+        } else {
+            outOfStonesOrbitoButtonCounter++;
+            if (outOfStonesOrbitoButtonCounter == 5) {
+                notifyGameEnded();
+            }
+        }
+    }
+
+    void setWinner(Player winner) {
+        gameEnded = true;
+        winner.setHasWon(true);
+    }
+
+    void checkForNoMoreStones() {
+        if (getCurrentPlayer().steinAnzahl == 0) {
+            outOfStones = true;
+        }
+    }
+
+    void checkForFourInARow() {
+        // Spiel.checkWin
+        for (int i = 0; i < 4; i++) {
+            if (board[i][0] == null)
+                continue;
+
+            Player c = board[i][0].getPlayer();
+            boolean won = true;
+
+            for (int j = 1; j < 4; j++) {
+                if (board[i][j] == null ||
+                        !board[i][j].getPlayer().equals(c)) {
+                    won = false;
+                    break;
+                }
+            }
+            if (won) {
+                setWinner(c);
+            }
+        }
+
+        for (int i = 0; i < 4; i++) {
+            if (board[0][i] == null)
+                continue;
+
+            Player c = board[0][i].getPlayer();
+            boolean won = true;
+
+            for (int j = 1; j < 4; j++) {
+                if (board[j][i] == null ||
+                        !board[j][i].getPlayer().equals(c)) {
+                    won = false;
+                    break;
+                }
+            }
+            if (won) {
+                setWinner(c);
+            }
+        }
+
+        if (board[0][0] != null) {
+            Player c = board[0][0].getPlayer();
+            boolean won = true;
+
+            for (int i = 1; i < 4; i++) {
+                if (board[i][i] == null ||
+                        !board[i][i].getPlayer().equals(c)) {
+                    won = false;
+                    break;
+                }
+            }
+            if (won) {
+                setWinner(c);
+            }
+        }
+
+        if (board[0][3] != null) {
+            Player c = board[0][3].getPlayer();
+            boolean won = true;
+
+            for (int i = 1; i < 4; i++) {
+                if (board[i][3 - i] == null ||
+                        !board[i][3 - i].getPlayer().equals(c)) {
+                    won = false;
+                    break;
+                }
+            }
+            if (won) {
+                setWinner(c);
+            }
+        }
+
+        if (gameEnded) {
+            notifyGameEnded();
+        }
+
+    }
+
+    public Player[] getPlayers() {
+        return player;
     }
     /*
      * int[] parsePos(String pos) {

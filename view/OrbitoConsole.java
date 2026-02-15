@@ -2,7 +2,7 @@ package view;
 
 import model.*;
 
-public class OrbitoConsole implements OrbitoBoardChangedListener {
+public class OrbitoConsole implements OrbitoModelListener {
     
     public OrbitoConsole(OrbitoModel model) {
         model.addBoardChangedListener(this);
@@ -27,5 +27,22 @@ public class OrbitoConsole implements OrbitoBoardChangedListener {
             System.out.println();
         }
         System.out.println();
+    }
+
+    void outputGameEnded(OrbitoModel model) {
+        System.out.println("Game ended!");
+        for(Player p : model.getPlayers()) {
+            if (p.getHasWon()) {
+                System.out.println("Winner: " + p.getName());
+            } else {
+                System.out.println("Loser: " + p.getName());
+            }
+        }    
+        System.out.println();
+    }
+
+    @Override
+    public void gameEnded(OrbitoGameEndedEvent e) {
+        outputGameEnded((OrbitoModel) e.getSource());
     } 
 }

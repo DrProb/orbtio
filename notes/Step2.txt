@@ -1,0 +1,7 @@
+Step 2: complete game model logic
+
+Missing features:
+* after push button check if win condition has been reached
+* if both players are out of stones game ends in a draw (5 times push button logic)
+
+Implemented and verified with test methods.

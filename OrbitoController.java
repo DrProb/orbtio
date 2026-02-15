@@ -10,11 +10,45 @@ public class OrbitoController
         model = new OrbitoModel();
         OrbitoConsole console = new OrbitoConsole(model);
 
-        model.placeStone(0, 0);
-        model.pushOrbitoButton();
-        model.placeStone(1, 1);
-        model.pushOrbitoButton();
+        testNoStonesLeft();
     }
+
+    void testWinPlayer1() {
+        placeAndPush(0, 1);
+        placeAndPush(1, 1);
+        placeAndPush(0, 0);
+        placeAndPush(2, 1);
+        placeAndPush(1, 0);
+        placeAndPush(2, 1);
+        placeAndPush(2, 0);
+    }
+
+    void testWinBoth() {
+        for (int i = 0; i < 12; i++) {
+            placeAndPush(0, 0);
+        }
+        for (int i = 0; i < 4; i++) {
+            placeAndPush(1, 1);
+        }
+    }
+
+    void testNoStonesLeft() {
+        for (int i = 0; i < 12; i++) {
+            placeAndPush(0, 0);
+        }
+        for (int i = 0; i < 4; i++) {
+            placeAndPush(1, 2);
+        }
+        for (int i = 0; i < 5; i++) {
+            System.out.println("Final Pushing Orbito button " + (i + 1) + "/5");
+            model.pushOrbitoButton();
+        }
+    }
+
+    void placeAndPush(int x, int y) {
+        model.placeStone(x, y);
+        model.pushOrbitoButton();
+     }
 /*     Scanner sc = new Scanner(System.in);
     spielbrett spielfeld;
     spieler[] spieler;

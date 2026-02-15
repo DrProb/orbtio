@@ -5,6 +5,7 @@ public class Player
     String name;
     int steinAnzahl;
     OrbitoStoneColor color;
+    boolean hasWon = false;
     /**
      * Konstruktor für Objekte der Klasse spieler
      */
@@ -18,11 +19,24 @@ public class Player
     OrbitoStone getStone() {
         if (steinAnzahl > 0) {
             steinAnzahl--;
-            return new OrbitoStone(color);
+            return new OrbitoStone(color, this);
         } else {
             throw new IllegalStateException("No stones left!");
         }
     }
+
+    void setHasWon(boolean hasWon) {
+        this.hasWon = hasWon;
+    }
+
+    public boolean getHasWon() {
+        return hasWon;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     void zug() {
         // System.out.println(name + " ist am Zug."); //Ich muss noch was basteln was anzeigt wer dran ist
         
