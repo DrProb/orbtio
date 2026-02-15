@@ -12,8 +12,6 @@ Branch V2 tries to restructure the existing source code in a "better" source cod
 - use events to decouble view from game logic
 - use english variable and method names
 
-Authors adevel
-
 Idea is not to touch/change the existing filesfrom main. 
 Thus, changes in the main branch are easily incorporated into V2 for easy reference.
 
@@ -21,6 +19,9 @@ Instead complete new source code files base on the currently existing files are 
 
 First major improvement is to abendon BlueJ. 
 
-LauncherV1.java allows to start the main version inside Visual Studio Code.
+LauncherV1.java allows to start the main branch version inside Visual Studio Code.
+LauncherV2.java allows to start the v2 branch version inside Visual Studio Code.
 
 notes/VisualStudioSetup.txt contains infos about the Visual Studio Code setup and JDK version used on windows.
+
+Authors: adevel, Leo

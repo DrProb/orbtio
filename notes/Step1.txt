@@ -1,0 +1,17 @@
+Step 1 aims to decouple game logic and output.
+
+The controller is OrbitoController.java: this class creates everything and would be the entry point in BlueJ, corresponding to Spiel.java in version 1.
+
+The model folder contains objects necessary for the model of the Orbito game — that is, the internal game logic with an internal model that can be read from the outside, as well as events that make victory or model changes consumable.
+
+Main part of the model is 
+OrbitoModel.Java: corresponds to old spielbrett.java.
+
+The goal is a game version in which the controller makes moves within the model and an ASCII output is generated in the process.
+
+Step1 is finished.
+
+It allows to 
+* place stones using OrbitoModel.placeStone
+* turn the board via OrbitoModel.pushOrbitoButton
+* to register a listener on OrbitoBoardChangedEvent
