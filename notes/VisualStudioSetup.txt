@@ -1,0 +1,29 @@
+https://code.visualstudio.com/docs/java/java-tutorial
+installed "Extension Pack For java" in visual studio code
+
+based on https://incusdata.com/blog/which-java-jdk-should-you-use
+and other google recommendations 
+
+Adoptium Eclipse Temurin.
+
+is the jdk to go for private use
+
+https://adoptium.net/de
+
+File downloaded:
+
+"C:\Users\adevel\Downloads\OpenJDK25U-jdk_x64_windows_hotspot_25.0.2_10.msi"
+
+Installation:
+
+Option) only for user adevel
+
+Check on command line
+ 
+C:\Users\adevel>java -version
+java version "1.8.0_221"
+Java(TM) SE Runtime Environment (build 1.8.0_221-b11)
+Java HotSpot(TM) 64-Bit Server VM (build 25.221-b11, mixed mode)
+
+In visual studio code "Run LauncherV1.java" starts the original game.
+ 

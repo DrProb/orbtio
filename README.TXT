@@ -4,3 +4,23 @@ To use it, dowload the zip-file, by clicking on "code" (top left corner) and sel
 Then, import the zip-file in blueJ. To start the game --- [...]
 
 Authors: Aaron, Leo, Darragh, Paul
+
+Branch V2 tries to restructure the existing source code in a "better" source code structure:
+- use folders to group objects
+- less public variables
+- clear seperation of concerns
+- use events to decouble view from game logic
+- use english variable and method names
+
+Authors adevel
+
+Idea is not to touch/change the existing filesfrom main. 
+Thus, changes in the main branch are easily incorporated into V2 for easy reference.
+
+Instead complete new source code files base on the currently existing files are created.
+
+First major improvement is to abendon BlueJ. 
+
+LauncherV1.java allows to start the main version inside Visual Studio Code.
+
+notes/VisualStudioSetup.txt contains infos about the Visual Studio Code setup and JDK version used on windows.
