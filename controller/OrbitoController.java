@@ -1,3 +1,5 @@
+package controller;
+
 import model.*;
 import view.*;
 
@@ -9,6 +11,7 @@ public class OrbitoController
     {
         model = new OrbitoModel();
         OrbitoConsole console = new OrbitoConsole(model);
+        OrbitoGUI gui = new OrbitoGUI(this);
 
         testNoStonesLeft();
     }

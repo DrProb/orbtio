@@ -1,0 +1,4 @@
+Step 3: create a complete GUI (OrbitoGUI.java) based on the existing code
+
+What is working:
+* GUI Window is displayed together with OrbitoBoard
