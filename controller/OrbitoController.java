@@ -10,10 +10,10 @@ public class OrbitoController
     public OrbitoController()
     {
         model = new OrbitoModel();
-        OrbitoConsole console = new OrbitoConsole(model);
+        //OrbitoConsole console = new OrbitoConsole(model);
         OrbitoGUI gui = new OrbitoGUI(this);
 
-        testNoStonesLeft();
+        //testNoStonesLeft();
     }
 
     void testWinPlayer1() {

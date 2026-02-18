@@ -2,6 +2,7 @@ package view;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import controller.OrbitoController;
 
 //based on Funktion.java and Bildschirm.java
@@ -9,52 +10,45 @@ public class OrbitoGUI {
 
     OrbitoController controller;
     JFrame frame;
+    OrbitoBoardPanel boardPanel;
 
     public OrbitoGUI(OrbitoController controller) {
         this.controller = controller;
-        frame = startJFrame();    
-
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        int width  = (int) screenSize.getWidth();
-        int height = (int) screenSize.getHeight();
-        
-        int brettM = (int) (height * 0.9);
-        
-        //Image brett = new ImageIcon("resources/OrbitoBoard.png").getImage();
-        int widthI = brettM;
-        int heightI = brettM;
-        addImageToJFrame("resources/OrbitoBoard.png", (width-widthI)/2, (height-heightI)/2, widthI, heightI, 10);
-
-        frame.repaint();
-    } 
-
-    JFrame startJFrame(){
-        JFrame frame = new JFrame("Orbito");
+        frame = new JFrame("Orbito");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        frame.setLocationRelativeTo(null);
-        //frame.setUndecorated(true);   // kein Rahmen, keine Buttons
-        frame.setVisible(true);
         frame.setLayout(null);
-        return frame;
-    }
+        //frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setSize(1400, 900);
+        //frame.setSize(800, 800);
+
+        frame.setLocationRelativeTo(null);
+        
+        JLabel label = new JLabel("Orbito Game");
+        label.setBounds(300, 10, 200, 30);
+        frame.add(label);
+
+        JLabel label2 = new JLabel("Player 1: 0 points");
+        label2.setBounds(10, 10, 200, 30);
+        frame.add(label2);
+
+        boardPanel = new OrbitoBoardPanel();
+        frame.add(boardPanel);
+
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                resizeFrame();
+            }
+        });
     
-    JLabel addImageToJFrame (String filename, int xPosition, int yPosition, int imageWide, int imageHight, int z){
-        Image imageToAdd = new ImageIcon(filename).getImage();
-        imageToAdd = scaleImage(imageToAdd, imageWide, imageHight);
-        ImageIcon icon = new ImageIcon(imageToAdd);
-        JLabel imageLabel = new JLabel(icon);
-        imageLabel.setBounds(xPosition, yPosition,imageWide, imageHight);
-        frame.getLayeredPane().add(imageLabel, Integer.valueOf(z));
-        return imageLabel;
+        frame.setVisible(true);
     }
 
-    public Image scaleImage(Image originalPicture, int wideImage,int hightImage){
-        //Image originalPicture = new ImageIcon(pathImage).getImage();
-        System.out.println(wideImage);
-        System.out.println(hightImage);
-        Image scaledPicture = originalPicture.getScaledInstance(wideImage, hightImage, Image.SCALE_SMOOTH);
-        return scaledPicture;
-    }    
+    private void resizeFrame() {
+        //System.out.println("Frame resized: " + frame.getWidth() + "x" + frame.getHeight());
+        
+        int boardSize = (int) (frame.getHeight() * 0.9);
+        boardPanel.setBounds((frame.getWidth()-boardSize)/2, (frame.getHeight()-boardSize)/2, boardSize, boardSize);
+    }
 
 }
