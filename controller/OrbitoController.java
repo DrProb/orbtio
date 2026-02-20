@@ -10,10 +10,11 @@ public class OrbitoController
     public OrbitoController()
     {
         model = new OrbitoModel();
-        //OrbitoConsole console = new OrbitoConsole(model);
+        OrbitoConsole console = new OrbitoConsole(model);
         OrbitoGUI gui = new OrbitoGUI(this);
 
         //testNoStonesLeft();
+        testWinPlayer1();
     }
 
     void testWinPlayer1() {
@@ -52,6 +53,11 @@ public class OrbitoController
         model.placeStone(x, y);
         model.pushOrbitoButton();
      }
+
+     public OrbitoModel getModel() {
+        return model;
+     }
+
 /*     Scanner sc = new Scanner(System.in);
     spielbrett spielfeld;
     spieler[] spieler;

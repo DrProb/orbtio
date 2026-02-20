@@ -3,4 +3,6 @@ Step 3: create a complete GUI (OrbitoGUI.java) based on the existing code
 What is working:
 * GUI Window is displayed together with OrbitoBoard
 * GUI now allowes resize
-* next Step cell.java
+* OrbitoBoardCell.java exists and hover is working
+* display stones is now working
+* next step placeStone in GUI

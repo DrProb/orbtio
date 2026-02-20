@@ -19,7 +19,6 @@ public class OrbitoGUI {
         frame.setLayout(null);
         //frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setSize(1400, 900);
-        //frame.setSize(800, 800);
 
         frame.setLocationRelativeTo(null);
         
@@ -31,7 +30,7 @@ public class OrbitoGUI {
         label2.setBounds(10, 10, 200, 30);
         frame.add(label2);
 
-        boardPanel = new OrbitoBoardPane();
+        boardPanel = new OrbitoBoardPane(controller);
         frame.add(boardPanel);
 
         frame.addComponentListener(new ComponentAdapter() {
@@ -45,8 +44,6 @@ public class OrbitoGUI {
     }
 
     private void resizeFrame() {
-        //System.out.println("Frame resized: " + frame.getWidth() + "x" + frame.getHeight());
-        
         int boardSize = (int) (frame.getHeight() * 0.9);
         boardPanel.setBounds((frame.getWidth()-boardSize)/2, (frame.getHeight()-boardSize)/2, boardSize, boardSize);
     }
