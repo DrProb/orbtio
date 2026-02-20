@@ -9,8 +9,13 @@ public class OrbitoBoardPanel extends JPanel {
     private final int VIRTUEL_BOARD_PANEL_WIDTH = 1000;
     private final int VIRTUEL_BOARD_PANEL_HEIGHT = 1000;
 
+    private final int CELL_START_X = 90;
+    private final int CELL_START_Y = 90;
+    private final int CELL_SIZE = 205;
+
     private JLabel boardLabel;
     private Image boardImage;
+    private OrbitoBoardCell cells[][] = new OrbitoBoardCell[4][4];
 
     public OrbitoBoardPanel() {
         this.setLayout(null);
@@ -19,6 +24,13 @@ public class OrbitoBoardPanel extends JPanel {
         boardLabel.setOpaque(true);
         boardLabel.setBackground(Color.RED);
         add(boardLabel);
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                cells[i][j] = new OrbitoBoardCell(this, i, j);
+                add(cells[i][j]);
+                setComponentZOrder(cells[i][j], 0);
+            }
+        }
         addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -28,23 +40,21 @@ public class OrbitoBoardPanel extends JPanel {
     }
 
     private void updateBoardImage() {
+        // you can use coordinates of a 1000x1000 pane. Scale will take care to convert them
         double scaleX = (double) getWidth() / VIRTUEL_BOARD_PANEL_WIDTH;
         double scaleY = (double) getHeight() / VIRTUEL_BOARD_PANEL_HEIGHT;
         double scale = Math.min(scaleX, scaleY);
-        int virtualX = 0;
-        int virtualY = 0;
-        int virtualWidth = 1000;
-        int virtualHeight = 1000;
 
-        int realX = (int) (virtualX * scale);
-        int realY = (int) (virtualY * scale);
-        int realWidth = (int) (virtualWidth * scale);
-        int realHeight = (int) (virtualHeight * scale);
-
-        boardLabel.setBounds(realX, realY, realWidth, realHeight);
-
-        Image scaledImage = boardImage.getScaledInstance(realWidth, realHeight, Image.SCALE_SMOOTH);
+        //display boardLabel
+        boardLabel.setBounds(0  , 0, (int)(1000*scale), (int)(1000*scale));        
+        Image scaledImage = boardImage.getScaledInstance((int)(1000*scale), (int)(1000*scale), Image.SCALE_SMOOTH);
         boardLabel.setIcon(new ImageIcon(scaledImage));
+
+        for (int i = 0; i < 4; i++) {
+            for (int j = 0; j < 4; j++) {
+                cells[i][j].setBounds((int)((CELL_START_X + i*CELL_SIZE) * scale), (int)((CELL_START_Y + j*CELL_SIZE) * scale), (int)(CELL_SIZE * scale), (int)(CELL_SIZE * scale));
+            }
+        }    
     }
     
 }
