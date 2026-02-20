@@ -4,7 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class OrbitoBoardPanel extends JPanel {
+public class OrbitoBoardPane extends JLayeredPane {
 
     private final int VIRTUEL_BOARD_PANEL_WIDTH = 1000;
     private final int VIRTUEL_BOARD_PANEL_HEIGHT = 1000;
@@ -13,22 +13,24 @@ public class OrbitoBoardPanel extends JPanel {
     private final int CELL_START_Y = 90;
     private final int CELL_SIZE = 205;
 
+    private final Object LAYER_BOARD = Integer.valueOf(10);
+    private final Object LAYER_CELLS = Integer.valueOf(20);
+
     private JLabel boardLabel;
     private Image boardImage;
     private OrbitoBoardCell cells[][] = new OrbitoBoardCell[4][4];
 
-    public OrbitoBoardPanel() {
+    public OrbitoBoardPane() {
         this.setLayout(null);
         boardImage = new ImageIcon(getClass().getResource("/resources/OrbitoBoard.png")).getImage();
         boardLabel = new JLabel(new ImageIcon(boardImage));
         boardLabel.setOpaque(true);
         boardLabel.setBackground(Color.RED);
-        add(boardLabel);
+        add(boardLabel, LAYER_BOARD);
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 cells[i][j] = new OrbitoBoardCell(this, i, j);
-                add(cells[i][j]);
-                setComponentZOrder(cells[i][j], 0);
+                add(cells[i][j], LAYER_CELLS);
             }
         }
         addComponentListener(new ComponentAdapter() {

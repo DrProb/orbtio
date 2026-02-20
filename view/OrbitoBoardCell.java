@@ -13,7 +13,7 @@ public class OrbitoBoardCell extends JLabel {
     public boolean occupied = false;
     private boolean hovered = false;
 
-    public OrbitoBoardCell(OrbitoBoardPanel board, int column, int row) {
+    public OrbitoBoardCell(OrbitoBoardPane board, int column, int row) {
         this.column = column;
         this.row = row;
         this.enabled = true;

@@ -10,7 +10,7 @@ public class OrbitoGUI {
 
     OrbitoController controller;
     JFrame frame;
-    OrbitoBoardPanel boardPanel;
+    OrbitoBoardPane boardPanel;
 
     public OrbitoGUI(OrbitoController controller) {
         this.controller = controller;
@@ -31,7 +31,7 @@ public class OrbitoGUI {
         label2.setBounds(10, 10, 200, 30);
         frame.add(label2);
 
-        boardPanel = new OrbitoBoardPanel();
+        boardPanel = new OrbitoBoardPane();
         frame.add(boardPanel);
 
         frame.addComponentListener(new ComponentAdapter() {
