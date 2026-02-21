@@ -164,6 +164,7 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
 
     @Override
     public void gameEnded(OrbitoGameEndedEvent e) {
+        updateBoardChanged();
         // outputGameEnded((OrbitoModel) e.getSource());
     }
 

@@ -6,4 +6,5 @@ What is working:
 * OrbitoBoardCell.java exists and hover is working
 * display stones is now working
 * You can add new Stones in GUI and Press orbito Button for next turn
-* next step show status text
+* show status text
+* next step: move stone
