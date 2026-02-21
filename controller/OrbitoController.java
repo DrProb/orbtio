@@ -15,6 +15,17 @@ public class OrbitoController
 
         //testNoStonesLeft();
         testWinPlayer1();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        gui.repaint();
+
+        System.out.println("Test finished");
+        
     }
 
     void testWinPlayer1() {

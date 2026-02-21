@@ -60,7 +60,7 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
         });
     }
 
-    private void updateBoardImage() {
+    public void updateBoardImage() {
         // you can use coordinates of a 1000x1000 pane. Scale will take care to convert
         // them
         double scaleX = (double) getWidth() / VIRTUEL_BOARD_PANEL_WIDTH;
@@ -106,12 +106,18 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
     @Override
     public void boardChanged(OrbitoBoardChangedEvent e) {
         updateStones((OrbitoModel) e.getSource());
-        updateBoardImage();
+        //updateBoardImage();
     }
 
     @Override
     public void gameEnded(OrbitoGameEndedEvent e) {
         // outputGameEnded((OrbitoModel) e.getSource());
     }
+
+    @Override
+    public void repaint() {
+        super.repaint();
+        updateBoardImage();
+    }   
 
 }

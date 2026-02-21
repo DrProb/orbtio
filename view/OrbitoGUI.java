@@ -48,4 +48,9 @@ public class OrbitoGUI {
         boardPanel.setBounds((frame.getWidth()-boardSize)/2, (frame.getHeight()-boardSize)/2, boardSize, boardSize);
     }
 
+    public void repaint() {
+        //boardPanel.updateBoardImage();
+        frame.repaint();
+    }
+
 }
