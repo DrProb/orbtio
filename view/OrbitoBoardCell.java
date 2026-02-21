@@ -9,7 +9,8 @@ public class OrbitoBoardCell extends JLabel {
 
     private int column;
     private int row;
-    public boolean enabled = false;
+    private boolean enabled = false;
+
     public boolean occupied = false;
     private boolean hovered = false;
 
@@ -38,16 +39,18 @@ public class OrbitoBoardCell extends JLabel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 
-                // if (enabled) {
-                //     if (bildschirm.modus == bildschirm.MODUS_MOVE) {
-                //         mouseClickedModusMove(e);
-                //     }
-                //     else if (bildschirm.modus == bildschirm.MODUS_PLACE) {
-                //         mouseClickedModusPlace(e);
-                //     }
-                // }
+                if (enabled) {
+                    // if (bildschirm.modus == bildschirm.MODUS_MOVE) {
+                        // mouseClickedModusMove(e);
+                    // }
+                    // else if (bildschirm.modus == bildschirm.MODUS_PLACE) {
+                        mouseClickedModusPlace(e);
+                    // }
+                }
             }
             public void mouseClickedModusPlace(MouseEvent e) {
+
+                board.controller.placeStone(column, row);
                     
                     // if (bildschirm.amZug.spielfeld.spielfeld[y][x] == null) {
                     //     hovered = false;
@@ -83,6 +86,22 @@ public class OrbitoBoardCell extends JLabel {
             }
         });
 
+    }
+
+    public int getColumn() {
+        return column;
+    }
+
+    public int getRow() {
+        return row;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override

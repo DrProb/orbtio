@@ -14,18 +14,17 @@ public class OrbitoController
         OrbitoGUI gui = new OrbitoGUI(this);
 
         //testNoStonesLeft();
-        testWinPlayer1();
-
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        gui.repaint();
-
-        System.out.println("Test finished");
+        // testWinPlayer1();
+        // System.out.println("Test finished");
         
+    }
+
+    public void placeStone(int column, int row) {
+        model.placeStone(column, row);
+    }
+
+    public void pushOrbitoButton() {
+        model.pushOrbitoButton();
     }
 
     void testWinPlayer1() {

@@ -9,12 +9,17 @@ public class OrbitoModel {
     int outOfStonesOrbitoButtonCounter = 0;
     private java.util.List<OrbitoModelListener> modelListeners = new java.util.ArrayList<>();
     private boolean gameEnded = false;
+    private OrbitoModelStatus status = OrbitoModelStatus.PLAYER_PLACE_STONE;
 
     public OrbitoModel() {
         this.board = new OrbitoStone[4][4];
         this.player = new Player[2];
         player[0] = new Player("Spieler 1", OrbitoStoneColor.WHITE);
         player[1] = new Player("Spieler 2", OrbitoStoneColor.BLACK);
+    }
+
+    public OrbitoModelStatus getStatus() {
+        return status;
     }
 
     public void addBoardChangedListener(OrbitoModelListener listener) {
@@ -51,6 +56,7 @@ public class OrbitoModel {
         }
         board[x][y] = getCurrentPlayer().getStone();
         currentPlayerHasMoved = true;
+        status = OrbitoModelStatus.PUSH_ORBITO_BUTTON;
         notifyBoardChanged();
     }
 
@@ -65,6 +71,10 @@ public class OrbitoModel {
     }
 
     public void pushOrbitoButton() {
+        if (status != OrbitoModelStatus.PUSH_ORBITO_BUTTON) {
+            throw new IllegalArgumentException("Invalid status for pushing Orbito button! Expected: " + OrbitoModelStatus.PUSH_ORBITO_BUTTON + ", Got: " + status);
+        }
+
         if (!outOfStones && !currentPlayerHasMoved) {
             throw new IllegalArgumentException("Current player has not moved!");
         }
@@ -98,6 +108,7 @@ public class OrbitoModel {
 
         currentPlayerIdx = (currentPlayerIdx + 1) % 2;
         currentPlayerHasMoved = false;
+        status = OrbitoModelStatus.PLAYER_PLACE_STONE;
         notifyBoardChanged();
         checkForFourInARow();
 
@@ -106,6 +117,7 @@ public class OrbitoModel {
         } else {
             outOfStonesOrbitoButtonCounter++;
             if (outOfStonesOrbitoButtonCounter == 5) {
+                status = OrbitoModelStatus.GAME_ENDED_NO_STONES_LEFT;
                 notifyGameEnded();
             }
         }
@@ -113,6 +125,11 @@ public class OrbitoModel {
 
     void setWinner(Player winner) {
         gameEnded = true;
+        if(status != OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON) {
+            status = OrbitoModelStatus.GAME_ENDED_SINGLE_PAYER_WON;
+        } else {
+            status = OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON;
+        }
         winner.setHasWon(true);
     }
 

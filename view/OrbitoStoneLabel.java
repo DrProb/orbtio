@@ -16,8 +16,6 @@ public class OrbitoStoneLabel extends JLabel {
         } else {
              stoneImage = new ImageIcon(getClass().getResource("/resources/sphere_white.png")).getImage();
         }
-        Image scaledImage = stoneImage.getScaledInstance((int)(1000*0.2), (int)(1000*0.2), Image.SCALE_SMOOTH);
-        //setIcon(new ImageIcon(stoneImage));
         setOpaque(false);
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -28,7 +26,7 @@ public class OrbitoStoneLabel extends JLabel {
     }
     
     private void resizeImage() {
-        Image scaledImage = stoneImage.getScaledInstance((int)(getWidth()*0.9), (int)(getHeight()*0.9), Image.SCALE_SMOOTH);
+        Image scaledImage = stoneImage.getScaledInstance((int)(getWidth()*0.8), (int)(getHeight()*0.8), Image.SCALE_SMOOTH);
         setIcon(new ImageIcon(scaledImage));
     }
 

@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import controller.OrbitoController;
+import model.OrbitoBoardChangedEvent;
+import model.OrbitoGameEndedEvent;
+import model.OrbitoModelListener;
 
 //based on Funktion.java and Bildschirm.java
 public class OrbitoGUI {
@@ -46,11 +49,6 @@ public class OrbitoGUI {
     private void resizeFrame() {
         int boardSize = (int) (frame.getHeight() * 0.9);
         boardPanel.setBounds((frame.getWidth()-boardSize)/2, (frame.getHeight()-boardSize)/2, boardSize, boardSize);
-    }
-
-    public void repaint() {
-        //boardPanel.updateBoardImage();
-        frame.repaint();
     }
 
 }
