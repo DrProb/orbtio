@@ -75,12 +75,12 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
 
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
-                cells[i][j].setBounds((int) ((CELL_START_X + i * CELL_SIZE) * scale),
-                        (int) ((CELL_START_Y + j * CELL_SIZE) * scale), (int) (CELL_SIZE * scale),
+                cells[i][j].setBounds((int) ((CELL_START_X + j * CELL_SIZE) * scale),
+                        (int) ((CELL_START_Y + i * CELL_SIZE) * scale), (int) (CELL_SIZE * scale),
                         (int) (CELL_SIZE * scale));
                 if (stones[i][j] != null) {
-                    stones[i][j].setBounds((int) ((CELL_START_X + 15 + i * CELL_SIZE) * scale),
-                            (int) ((CELL_START_Y + j * CELL_SIZE) * scale), (int) (CELL_SIZE * scale),
+                    stones[i][j].setBounds((int) ((CELL_START_X + 15 + j * CELL_SIZE) * scale),
+                            (int) ((CELL_START_Y + i * CELL_SIZE) * scale), (int) (CELL_SIZE * scale),
                             (int) (CELL_SIZE * scale));
                 }
             }
