@@ -65,6 +65,7 @@ public class OrbitoController {
 
     private void runTests() {
             testWinPlayer1();
+            testWinPlayer1WithMove();
             testDraw();
             testBothWin();
     }
@@ -83,6 +84,26 @@ public class OrbitoController {
             System.out.println("[NOK] Test testWinPlayer1 failed!");
         } else {
             System.out.println("[OK] Test testWinPlayer1 passed!");
+        }
+
+        startNewGame();
+    }
+
+    void testWinPlayer1WithMove() {
+ 
+        placeAndPush(0, 1);
+        placeAndPush(1, 1);
+        placeAndPush(0, 0);
+        placeAndPush(2, 1);
+        placeAndPush(1, 0);
+        placeAndPush(1, 0);
+        moveStone(2, 0, 1, 0);
+        placeAndPush(2, 0);
+
+        if (!testGameCondition(OrbitoModelStatus.GAME_ENDED_SINGLE_PAYER_WON, true, false) ) {
+            System.out.println("[NOK] Test testWinPlayer1WithMove failed!");
+        } else {
+            System.out.println("[OK] Test testWinPlayer1WithMove passed!");
         }
 
         startNewGame();
