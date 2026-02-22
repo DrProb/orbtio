@@ -143,30 +143,30 @@ public class OrbitoModel {
         notifyBoardChanged();
     }
 
-    public void moveStone(int startColumn, int startRow, int targetColumn, int targetRow) {
+    public void moveStone(int startRow, int startColumn, int targetRow, int targetColumn) {
         if (status != OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE) {
             throw new IllegalArgumentException("Invalid status for moving stone! Expected: "
                     + OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE + ", Got: " + status);
         }
-        if (startColumn < 0 || startColumn > 3 || startRow < 0 || startRow > 3 ||
-                targetColumn < 0 || targetColumn > 3 || targetRow < 0 || targetRow > 3) {
+        if (startRow < 0 || startRow > 3 || startColumn < 0 || startColumn > 3 ||
+                targetRow < 0 || targetRow > 3 || targetColumn < 0 || targetColumn > 3) {
             throw new IllegalArgumentException("Invalid Position!");
         }
-        if (board[startColumn][startRow] == null) {
+        if (board[startRow][startColumn] == null) {
             throw new IllegalArgumentException("No stone at start position!");
         }
-        if (board[startColumn][startRow].getPlayer() == getCurrentPlayer()) {
+        if (board[startRow][startColumn].getPlayer() == getCurrentPlayer()) {
             throw new IllegalArgumentException("You can only move opponent's stones!");
         }
-        if (board[targetColumn][targetRow] != null) {
+        if (board[targetRow][targetColumn] != null) {
             throw new IllegalArgumentException("Target cell is already occupied!");
         }
-        if (Math.abs(startColumn - targetColumn) + Math.abs(startRow - targetRow) != 1) {
+        if (Math.abs(startRow - targetRow) + Math.abs(startColumn - targetColumn) != 1) {
             throw new IllegalArgumentException("You can only move to adjacent cells!");
         }
         setModelStatus(OrbitoModelStatus.PLAYER_PLACE_STONE);
-        board[targetColumn][targetRow] = board[startColumn][startRow];
-        board[startColumn][startRow] = null;
+        board[targetRow][targetColumn] = board[startRow][startColumn];
+        board[startRow][startColumn] = null;
         notifyBoardChanged();
     }
 

@@ -39,9 +39,9 @@ public class OrbitoController {
         model.pushOrbitoButton();
     }
 
-    public void moveStone(int fromColumn, int fromRow, int toColumn, int toRow) {
+    public void moveStone(int fromRow, int fromColumn, int toRow, int toColumn) {
         runTestsWithDelay();
-        model.moveStone(fromColumn, fromRow, toColumn, toRow);
+        model.moveStone(fromRow, fromColumn, toRow, toColumn);
     }
 
     public void startNewGame() {
