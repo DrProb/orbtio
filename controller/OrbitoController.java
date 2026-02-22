@@ -7,30 +7,70 @@ public class OrbitoController {
 
     OrbitoModel model;
 
+    private final boolean RUN_TESTS = false;
+    private final boolean RUN_TESTS_WITH_GUI = true;
+    private final boolean RUN_TESTS_WITH_CONSOLE = false;
+    private final int RUN_TESTS_ACTION_DELAY_MS = 500;
+
     public OrbitoController() {
         model = new OrbitoModel();
-        OrbitoConsole console = new OrbitoConsole(model);
-        OrbitoGUI gui = new OrbitoGUI(this);
+        if (!RUN_TESTS) {
+            new OrbitoConsole(model);
+            new OrbitoGUI(this);
 
-        // testNoStonesLeft();
-        // testWinPlayer1();
-        // System.out.println("Test finished");
-
+        } else {
+            if (RUN_TESTS_WITH_CONSOLE) {
+                new OrbitoConsole(model);
+            }
+            if (RUN_TESTS_WITH_GUI) {
+                new OrbitoGUI(this);
+            }
+            runTests();
+        }
     }
 
-    public void placeStone(int column, int row) {
-        model.placeStone(column, row);
+    public void placeStone(int row, int column) {
+        runTestsWithDelay();
+        model.placeStone(row, column);
     }
 
     public void pushOrbitoButton() {
+        runTestsWithDelay();
         model.pushOrbitoButton();
     }
 
     public void moveStone(int fromColumn, int fromRow, int toColumn, int toRow) {
+        runTestsWithDelay();
         model.moveStone(fromColumn, fromRow, toColumn, toRow);
     }
 
+    public void startNewGame() {
+        runTestsWithDelay();
+        model.initializeGame();
+    }
+    
+    public OrbitoModel getModel() {
+        return model;
+    }
+    
+    private void runTestsWithDelay() {
+        if (RUN_TESTS_ACTION_DELAY_MS > 0) {
+            try {
+                Thread.sleep(RUN_TESTS_ACTION_DELAY_MS);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private void runTests() {
+            testWinPlayer1();
+            testDraw();
+            testBothWin();
+    }
+
     void testWinPlayer1() {
+ 
         placeAndPush(0, 1);
         placeAndPush(1, 1);
         placeAndPush(0, 0);
@@ -38,18 +78,34 @@ public class OrbitoController {
         placeAndPush(1, 0);
         placeAndPush(2, 1);
         placeAndPush(2, 0);
+
+        if (!testGameCondition(OrbitoModelStatus.GAME_ENDED_SINGLE_PAYER_WON, true, false) ) {
+            System.out.println("[NOK] Test testWinPlayer1 failed!");
+        } else {
+            System.out.println("[OK] Test testWinPlayer1 passed!");
+        }
+
+        startNewGame();
     }
 
-    void testWinBoth() {
-        for (int i = 0; i < 12; i++) {
-            placeAndPush(0, 0);
+    private boolean testGameCondition(OrbitoModelStatus expectedStatus, boolean player1Won, boolean player2Won) {
+        OrbitoModelStatus actualStatus = model.getStatus();
+        if (actualStatus != expectedStatus) {
+            System.out.println("Expected game status: " + expectedStatus + ", but got: " + actualStatus);
+            return false;
         }
-        for (int i = 0; i < 4; i++) {
-            placeAndPush(1, 1);
+        if(model.getPlayers()[0].getHasWon() != player1Won) {
+            System.out.println("Expected Player 1 win status: " + player1Won + ", but got: " + model.getPlayers()[0].getHasWon());
+            return false;
         }
+        if(model.getPlayers()[1].getHasWon() != player2Won) {
+            System.out.println("Expected Player 2 win status: " + player2Won + ", but got: " + model.getPlayers()[1].getHasWon());
+            return false;
+        }   
+        return true;
     }
 
-    void testNoStonesLeft() {
+    void testDraw() {
         for (int i = 0; i < 12; i++) {
             placeAndPush(0, 0);
         }
@@ -57,17 +113,41 @@ public class OrbitoController {
             placeAndPush(1, 2);
         }
         for (int i = 0; i < 5; i++) {
-            System.out.println("Final Pushing Orbito button " + (i + 1) + "/5");
-            model.pushOrbitoButton();
+            pushOrbitoButton();
         }
+        if (!testGameCondition(OrbitoModelStatus.GAME_ENDED_NO_STONES_LEFT, false, false) ) {
+            System.out.println("[NOK] Test testDraw failed!");
+        } else {
+            System.out.println("[OK] Test testDraw passed!");
+        }
+
+        startNewGame();
     }
 
-    void placeAndPush(int x, int y) {
-        model.placeStone(x, y);
-        model.pushOrbitoButton();
+    void testBothWin() {
+        for (int i = 0; i < 9; i++) {
+            placeAndPush(0, 0);
+        }
+        placeAndPush(0, 1);
+        placeAndPush(1, 0);
+        placeAndPush(0, 0);
+        placeAndPush(1, 2);
+        placeAndPush(2, 1);
+        placeAndPush(1, 1);
+        placeAndPush(1, 1);
+        pushOrbitoButton();
+
+        if (!testGameCondition(OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON, true, true) ) {
+            System.out.println("[NOK] Test testBothWin failed!");
+        } else {
+            System.out.println("[OK] Test testBothWin passed!");
+        }
+
+        startNewGame();
     }
 
-    public OrbitoModel getModel() {
-        return model;
+    private void placeAndPush(int x, int y) {
+        placeStone(x, y);
+        pushOrbitoButton();
     }
 }

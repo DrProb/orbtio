@@ -50,22 +50,22 @@ public class OrbitoModel {
         return outOfStonesOrbitoButtonCounter;
     }
 
-    public void placeStone(int x, int y) {
+    public void placeStone(int row, int column) {
         if (status != OrbitoModelStatus.PLAYER_PLACE_STONE && status != OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE) {
             throw new IllegalArgumentException(
                     "Invalid status for placing stone! Expected: " + OrbitoModelStatus.PLAYER_PLACE_STONE + " or "
                             + OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE + ", Got: " + status);
         }
-        if (x < 0 || x > 3 || y < 0 || y > 3 || board[x][y] != null) {
+        if (row < 0 || row > 3 || column < 0 || column > 3 || board[row][column] != null) {
             throw new IllegalArgumentException("Invalid Position!");
         }
-        if (board[x][y] != null) {
+        if (board[row][column] != null) {
             throw new IllegalArgumentException("Cell already occupied!");
         }
         if (currentPlayerHasMoved) {
             throw new IllegalArgumentException("Current player has already moved!");
         }
-        board[x][y] = getCurrentPlayer().getStone();
+        board[row][column] = getCurrentPlayer().getStone();
         currentPlayerHasMoved = true;
         setModelStatus(OrbitoModelStatus.PUSH_ORBITO_BUTTON);
         notifyBoardChanged();
@@ -282,4 +282,19 @@ public class OrbitoModel {
     public Player[] getPlayers() {
         return player;
     }
+
+    public void initializeGame() {
+        this.board = new OrbitoStone[4][4];
+        player[0].setHasWon(false);
+        player[0].steinAnzahl =8;
+        player[1].setHasWon(false);
+        player[1].steinAnzahl =8;
+        currentPlayerIdx = 0;
+        currentPlayerHasMoved = false;
+        outOfStones = false;
+        gameHasWinner = false;
+        outOfStonesOrbitoButtonCounter = 5;
+        setModelStatus(OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE);
+        notifyBoardChanged();
+    }    
 }

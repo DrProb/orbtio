@@ -90,7 +90,7 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
 
         if (modelStatus == OrbitoModelStatus.PLAYER_PLACE_STONE
                 || modelStatus == OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE) {
-            OrbitoStone stoneInCell = board[orbitoBoardCell.getColumn()][orbitoBoardCell.getRow()];
+            OrbitoStone stoneInCell = board[orbitoBoardCell.getRow()][orbitoBoardCell.getColumn()];
             if (stoneInCell == null) {
                 orbitoBoardCell.setStatus(OrbitoBoardCellStatus.PLACE_STONE);
             } else if (stoneInCell.getPlayer() != model.getCurrentPlayer()
@@ -110,7 +110,7 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
 
         if (model.getStatus() == OrbitoModelStatus.PLAYER_PLACE_STONE
                 || model.getStatus() == OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE) {
-            OrbitoStone stoneInCell = board[orbitoBoardCell.getColumn()][orbitoBoardCell.getRow()];
+            OrbitoStone stoneInCell = board[orbitoBoardCell.getRow()][orbitoBoardCell.getColumn()];
             if (stoneInCell == null && isNeighborOfMoveSource(orbitoBoardCell)) {
                 orbitoBoardCell.setStatus(OrbitoBoardCellStatus.MOVE_STONE_TARGET);
             } else if (orbitoBoardCell == moveSourceCell) {
@@ -124,8 +124,8 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
     }
 
     private boolean isNeighborOfMoveSource(OrbitoBoardCell orbitoBoardCell) {
-        return Math.abs(orbitoBoardCell.getColumn() - moveSourceCell.getColumn())
-                + Math.abs(orbitoBoardCell.getRow() - moveSourceCell.getRow()) == 1;
+        return Math.abs(orbitoBoardCell.getRow() - moveSourceCell.getRow())
+                + Math.abs(orbitoBoardCell.getColumn() - moveSourceCell.getColumn()) == 1;
     }
 
     public void scaleAndPlaceAllControls() {
@@ -178,7 +178,7 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
         status = OrbitoBoardPaneStatus.NORMAL;
         moveSourceCell = null;
 
-        controller.moveStone(sourceCell.getColumn(), sourceCell.getRow(), targetCell.getColumn(), targetCell.getRow());
+        controller.moveStone(sourceCell.getRow(), sourceCell.getColumn(), targetCell.getRow(), targetCell.getColumn());
         // updateCellStates(); // will be called from boardChanged after the move is
         // executed
     }
@@ -193,8 +193,8 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
 
     private boolean emptyNeighboringCellExists(OrbitoBoardCell orbitoBoardCell) {
         OrbitoStone[][] board = model.getBoard();
-        int col = orbitoBoardCell.getColumn();
-        int row = orbitoBoardCell.getRow();
+        int col = orbitoBoardCell.getRow();
+        int row = orbitoBoardCell.getColumn();
         // Check all 4 neighboring cells (up, down, left, right)
         if (col > 0 && board[col - 1][row] == null)
             return true;

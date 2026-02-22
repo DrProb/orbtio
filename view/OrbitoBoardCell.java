@@ -10,18 +10,18 @@ import java.awt.event.*;
 //based on cell.java
 public class OrbitoBoardCell extends JLabel {
 
-    private int column;
     private int row;
+    private int column;
     private OrbitoBoardCellStatus status = OrbitoBoardCellStatus.DISABLED;
     private OrbitoBoardPane board;
 
     private boolean hovered = false;
     private OrbitoBoardCell myself;
 
-    public OrbitoBoardCell(OrbitoBoardPane board, int column, int row) {
+    public OrbitoBoardCell(OrbitoBoardPane board, int row, int column) {
         this.board = board;
-        this.column = column;
         this.row = row;
+        this.column = column;
         this.setOpaque(false);
         myself = this;
 
@@ -44,13 +44,13 @@ public class OrbitoBoardCell extends JLabel {
             @Override
             public void mouseClicked(MouseEvent e) {
 
-                System.out.println("Clicked cell " + column + ", " + row + " with status " + status);
+                System.out.println("Clicked cell row: " + row + " column: " + column + " with status " + status);
 
                 switch (status) {
                     case DISABLED:
                         return;
                     case PLACE_STONE:
-                        board.controller.placeStone(column, row);
+                        board.controller.placeStone(row, column);
                         break;
                     case MOVE_STONE_DESELECT_SOURCE:
                         board.cancelMoveCell();
@@ -75,12 +75,12 @@ public class OrbitoBoardCell extends JLabel {
         this.status = status;
     }
 
-    public int getColumn() {
-        return column;
-    }
-
     public int getRow() {
         return row;
+    }
+
+    public int getColumn() {
+        return column;
     }
 
     @Override
