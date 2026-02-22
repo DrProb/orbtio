@@ -23,6 +23,8 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
     private final int CELL_START_Y = 90;
     private final int CELL_SIZE = 205;
 
+    private final int STONE_SIZE = (int)(CELL_SIZE * 0.7);
+
     private final Object LAYER_BOARD = Integer.valueOf(10);
     private final Object LAYER_STONES = Integer.valueOf(20);
     private final Object LAYER_CELLS = Integer.valueOf(30);
@@ -143,15 +145,17 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
                 Image.SCALE_SMOOTH);
         boardLabel.setIcon(new ImageIcon(scaledImage));
 
+        int stoneOffset = (int) ((CELL_SIZE - STONE_SIZE) / 2);
+
         for (int i = 0; i < 4; i++) {
             for (int j = 0; j < 4; j++) {
                 cells[i][j].setBounds((int) ((CELL_START_X + j * CELL_SIZE) * scale),
                         (int) ((CELL_START_Y + i * CELL_SIZE) * scale), (int) (CELL_SIZE * scale),
                         (int) (CELL_SIZE * scale));
                 if (stones[i][j] != null) {
-                    stones[i][j].setBounds((int) ((CELL_START_X + 15 + j * CELL_SIZE) * scale),
-                            (int) ((CELL_START_Y + i * CELL_SIZE) * scale), (int) (CELL_SIZE * scale),
-                            (int) (CELL_SIZE * scale));
+                    stones[i][j].setBounds((int) ((CELL_START_X + stoneOffset + j * CELL_SIZE) * scale),
+                            (int) ((CELL_START_Y + stoneOffset + i * CELL_SIZE) * scale), (int) (STONE_SIZE * scale),
+                            (int) (STONE_SIZE * scale));
                 }
             }
         }

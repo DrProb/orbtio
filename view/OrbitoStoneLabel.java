@@ -26,7 +26,7 @@ public class OrbitoStoneLabel extends JLabel {
     }
     
     private void resizeImage() {
-        Image scaledImage = stoneImage.getScaledInstance((int)(getWidth()*0.8), (int)(getHeight()*0.8), Image.SCALE_SMOOTH);
+        Image scaledImage = stoneImage.getScaledInstance((int)(getWidth()), (int)(getHeight()), Image.SCALE_SMOOTH);
         setIcon(new ImageIcon(scaledImage));
     }
 

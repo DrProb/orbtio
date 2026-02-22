@@ -46,6 +46,7 @@ public class OrbitoController {
 
     public void startNewGame() {
         runTestsWithDelay();
+        runTestsWithDelay();
         model.initializeGame();
     }
     
