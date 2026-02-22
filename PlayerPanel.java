@@ -7,6 +7,7 @@ public class PlayerPanel extends Funktionen
     Textfeld textfeld;
     JFrame frame;
     int width, height, x, y, screenWidth, screenHeight;
+    JLabel amZugIndicator;
     public PlayerPanel(JFrame frame, String color, int screenWidth, int screenHeight, int x, int y, String name, spieler spieler) {
         this.color = color;
         this.frame = frame;
@@ -38,14 +39,36 @@ public class PlayerPanel extends Funktionen
             }
         });
     }
-    
+    void addAmZugIndicator(String color){
+        Image zug = new ImageIcon("amZug_"+color+".png").getImage();
+        double zugWidth = width/4.0;
+        double zugHeight = (zugWidth*(167.0/207.0));
+        int m = 0;
+        if (color.equals("s")) {m = width;} 
+        
+        amZugIndicator = addImageToJFrame(zug, frame, (int) ((x+width-(zugWidth/2.0))-m), 46, (int)zugWidth, (int) zugHeight, 4567893);
+        frame.repaint();
+    }
+    void removeAmZugIndicator() {
+        if (amZugIndicator != null) {
+        frame.getLayeredPane().remove(amZugIndicator);
+        amZugIndicator = null;
+        frame.repaint();
+    }
+    }
+    public void showDraw(String color) {
+        Image pokal = new ImageIcon("pokal2_"+color+".png").getImage();
+        double heightPokal = ((screenHeight-height)*0.88);
+        double widthPokal = (heightPokal*(280.0/1318.0));
+        JLabel pokalLabel = addImageToJFrame (pokal, frame, (int) (x+(widthPokal/2.0)), (int) (y+((double)height*1.025)), (int) widthPokal, (int) heightPokal, 14714424);
+    }
     public void showWin() {
         Image pokal = null;
         try {
             pokal = new ImageIcon("pokal2.png").getImage();
         } catch (Exception e){
             //pokal = new ImageIcon("pokal.png").getImage();
-            System.out.println("Fehler bei getImage()");
+            //System.out.println("Fehler bei getImage()");
         }
             
         

@@ -55,13 +55,13 @@ public class spielbrett {
     }   
     int[] parsePos(String pos) {
         if (pos.length()!=2) {
-            System.out.println("Ungültige Eingabe, versuche es erneut!");
+            //System.out.println("Ungültige Eingabe, versuche es erneut!");
             return null;
         }
         int clm = Character.toUpperCase(pos.charAt(0)) - 'A';
         int row = pos.charAt(1) - '1';
         if (row < 0 || row > 3 || clm < 0 || clm > 3) {
-            System.out.println("Dieses Feld existiert nicht, versuche es erneut!");
+            //System.out.println("Dieses Feld existiert nicht, versuche es erneut!");
             return null;
         }
         return new int[] {row,clm};
@@ -77,7 +77,7 @@ public class spielbrett {
             case "d":
                 return new int [] {1, 0};
             default:
-                System.out.print("Ungültige Eingabe - Versuche es erneut!");
+                //System.out.print("Ungültige Eingabe - Versuche es erneut!");
                 return null;
         }
     }
@@ -89,15 +89,15 @@ public class spielbrett {
         int row = p[0];
         int clm = p[1];  
         if (spielfeld[row][clm] == null) {
-            System.out.println("Hier ist kein Stein! Gib ein anderes Feld ein!");
+            //System.out.println("Hier ist kein Stein! Gib ein anderes Feld ein!");
             return false;
         }
         if (spielfeld[row][clm].color == color) {
-            System.out.println("Du kannst nur Figuren deines Gegners bewegen! Gib ein anderes Feld ein!");
+            //System.out.println("Du kannst nur Figuren deines Gegners bewegen! Gib ein anderes Feld ein!");
             return false;
         }
         while (true) {
-            System.out.println("In welche Richtung möchtest du den Stein bewegen? (l / r / u / d / exit)");
+            //System.out.println("In welche Richtung möchtest du den Stein bewegen? (l / r / u / d / exit)");
             String dir = sc.nextLine();
             if (dir == "exit") {
                 return false;
@@ -107,14 +107,14 @@ public class spielbrett {
             int clmO = o[1];
             try {
                 if (spielfeld[row+rowO][clm+clmO] != null) {
-                    System.out.println("Dieses Feld ist belegt!");
+                    //System.out.println("Dieses Feld ist belegt!");
                     break;
                 }
                 spielfeld[row+rowO][clm+clmO] = spielfeld[row][clm];
                 spielfeld[row][clm] = null;
                 return true;
             } catch (Exception ArrayIndexOutOfBoundsException) {
-                System.out.println("Du kannst die Steine nicht aus dem Feld rausverschieben!");
+                //System.out.println("Du kannst die Steine nicht aus dem Feld rausverschieben!");
             }     
         }
         return true;

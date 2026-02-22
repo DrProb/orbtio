@@ -8,6 +8,8 @@ public class Spiel
     Music music;
     Bildschirm bildschirm;
     int spIdx = 1;
+    int endEventCounter = 0;
+    Textfeld countdown = null;
     public Spiel()
     {
         
@@ -28,6 +30,7 @@ public class Spiel
     void reset() {
         bildschirm.bildschirm.dispose();
         spIdx = 1;
+        endEventCounter = 0;
         this.music = new Music();
         this. spielfeld = new spielbrett();
         //System.out.println("Spiel gestartet. Wie heißt Spieler 1? ");
@@ -46,6 +49,7 @@ public class Spiel
         System.exit(0);
     }
     public void naechsterSpieler() {
+        bildschirm.removeAmZug();
         spielfeld.showBoard();   
         String[] winC = checkWin();
          if (winC[0] != null) {
@@ -65,35 +69,32 @@ public class Spiel
             //spieler winner = null;
            
         } else {
-            for (int i=0; i < 5; i++) {
-                spielfeld.orbito.drehen(spielfeld.spielfeld);
-                winC = checkWin();
-                spieler winner = null;
-            if (winC[0] != null) {
-                if (winC[1] != null) {
-                    end("beide");
-                } else {
-                    end(winC[0]);
-                }  
-                return;
+            if (endEventCounter < 5) {
+                if(endEventCounter == 0) {countdown = bildschirm.addCountdown();}
+                countdown.setText(""+(5-endEventCounter));
+                bildschirm.removeOrbitoKnopf();
+                bildschirm.showOrbitoKnopf();
+                endEventCounter++;
+            } else {
+                countdown.setText("0");
+                end(null);
             }
-            }
-            end(null);
-            return;
         }
     }   
     private void end(String winner) {
+        bildschirm.removeOrbitoKnopf();
+        bildschirm.disableAll();
         if (winner == null) {
-            System.out.println("Unentschieden!");
+            //System.out.println("Unentschieden!");
             bildschirm.unentschieden();
         } else if (winner.equals("beide")) {
-            System.out.println("Beide haben gleichzeitig gewonnen! Unentschieden!");
+            //System.out.println("Beide haben gleichzeitig gewonnen! Unentschieden!");
             bildschirm.unentschieden();
         } else {
             for(spieler s: spieler) { 
                 if(s.color.equals(winner)) { 
                                
-                    System.out.println(s.name + " hat gewonnen!");
+                    //System.out.println(s.name + " hat gewonnen!");
                     bildschirm.gewonnen(s.color);
                 }
             }              

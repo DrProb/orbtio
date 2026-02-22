@@ -21,6 +21,7 @@ public class Bildschirm extends Funktionen
     double cellSize;
     JLabel knopfLabel;
     int modus;
+    JLabel amZugIndicator;
     
     final int MODUS_MOVE = 1;
     final int MODUS_PLACE = 0;
@@ -73,15 +74,26 @@ public class Bildschirm extends Funktionen
         
         
         }
+        /**
+        void addLine(String dir, int row) {
+            im
+        }
+        **/
+        Textfeld addCountdown() {
+            int TWidth = width/38; 
+            Textfeld countdown = new Textfeld(bildschirm, TWidth, TWidth, (int) (((width-TWidth)/2.0)+width*0.0035), (height-TWidth)/2, "5");
+            return countdown;
+        }
         void showOrbitoKnopf() {
             for (cell[] row : cells) {
                 for (cell cell : row) {
                     cell.enabled = false;
                 }
             }
-            Image knopf = new ImageIcon("orbitoKnopf.png").getImage();
+            Image knopf = new ImageIcon("orbitoButton.png").getImage();
             //int knopfWidth
-            knopfLabel = addImageToJFrame(knopf, bildschirm, 920, 550, 100, 100, 10000);
+            int knopfWidth = width/19;
+            knopfLabel = addImageToJFrame(knopf, bildschirm, (int) (((width-knopfWidth)/2.0)+width*0.0035), (int) (((height-knopfWidth)/2.0)+height*0.0035), knopfWidth, knopfWidth, 10000);
             
             //bildschirm.getLayeredPane().add(knopfLabel, Integer.valueOf(1000));
             
@@ -89,23 +101,29 @@ public class Bildschirm extends Funktionen
             /**
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (!enabled) return;
-                hovered = true;
-                image.repaint();
+                
+                knopfLabel.setBounds((int) (((width-knopfWidth)/2.0)+width*0.0035),(height-knopfWidth)/2, (int) (knopfWidth*1.2), (int) (knopfWidth*1.2));
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                hovered = false;
-                image.repaint();
+                knopfLabel.setBounds((int) (((width-knopfWidth)/2.0)+width*0.0035),(height-knopfWidth)/2, knopfWidth, knopfWidth);
             }
-            **/
+            */
             @Override
             public void mouseClicked(MouseEvent e) {
                 amZug.spielfeld.spielfeld = amZug.spielfeld.orbito.drehen(amZug.spielfeld.spielfeld);
                 amZug.spiel.naechsterSpieler();
             }
+            
         });
+        }
+        void disableAll() {
+            for (cell[] row: cells) {
+                for (cell cell : row) {
+                    cell.enabled = false;
+                }
+            }
         }
         void removeOrbitoKnopf() {
             if (knopfLabel != null) {
@@ -114,9 +132,24 @@ public class Bildschirm extends Funktionen
         }
         
         }
+        void removeAmZug() {
+            if (amZug == null) {return;}
+            if (amZug.color.equals("w")) {
+                weiss.removeAmZugIndicator();
+            }else {
+                schwarz.removeAmZugIndicator();
+            }
+        }
+        void addAmZug() {
+            if (amZug.color.equals("w")) {
+                weiss.addAmZugIndicator("w");
+            }else {
+                schwarz.addAmZugIndicator("s");
+            }
+        } 
         void unentschieden() {
-            weiss.showWin();
-            schwarz.showWin();
+            weiss.showDraw("w");
+            schwarz.showDraw("s");
         }
         void gewonnen(String winnerColor) {
             if (winnerColor.equals("s")) {
@@ -126,11 +159,13 @@ public class Bildschirm extends Funktionen
             }
         }
         void newGame() {
-            Image newGame = new ImageIcon("newGame.png").getImage();
-            Image closeGame = new ImageIcon("closeGame.png").getImage();
+            Image newGame = new ImageIcon("new.png").getImage();
+            Image closeGame = new ImageIcon("close.png").getImage();
             
-            JLabel newGameLabel = addImageToJFrame (newGame, bildschirm, 300, 500, 200, 50, 456787678);
-            JLabel closeGameLabel = addImageToJFrame (closeGame, bildschirm, 600, 500, 200, 50, 456787678);
+            double widthButton = ((height*0.9)/2)*0.8;
+            //double heightNewGame = widthNewGame*(291.0/)
+            JLabel newGameLabel = addImageToJFrame (newGame, bildschirm, (int) (((width*0.95)/2.0)-widthButton), (int) (height*0.005), (int) widthButton, (int) (widthButton*(291.0/1013.0)), 456787678);
+            JLabel closeGameLabel = addImageToJFrame (closeGame, bildschirm, (int) ((width*(100.0/95.0))/2.0), (int) (height*0.005),  (int) widthButton, (int) (widthButton*(351.0/1240.0)), 456787678);
             
             newGameLabel.addMouseListener(new MouseAdapter() {
             @Override
@@ -187,7 +222,9 @@ public class Bildschirm extends Funktionen
     }
     public void startPlacing(spieler spieler) {
     removeOrbitoKnopf();
+    removeAmZug();
     amZug = spieler;
+    addAmZug();
     /**
     for (cell[] row : cells) {
             for (cell cell : row) {

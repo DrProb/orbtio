@@ -13,8 +13,8 @@ public class Funktionen
     
     public Image scaleImage(Image originalPicture, int wideImage,int hightImage){
         //Image originalPicture = new ImageIcon(pathImage).getImage();
-        System.out.println(wideImage);
-        System.out.println(hightImage);
+        //System.out.println(wideImage);
+        //System.out.println(hightImage);
         Image scaledPicture = originalPicture.getScaledInstance(wideImage, hightImage, Image.SCALE_SMOOTH);
         return scaledPicture;
     }
