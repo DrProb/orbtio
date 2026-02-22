@@ -10,7 +10,7 @@ public class OrbitoConsole implements OrbitoModelListener {
 
     @Override
     public void boardChanged(OrbitoBoardChangedEvent e) {
-        System.out.println("Board changed!");
+        System.out.println("Board changed Event!");
         outputBoard((OrbitoModel) e.getSource());  
     }
 

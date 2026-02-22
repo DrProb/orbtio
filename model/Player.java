@@ -5,6 +5,7 @@ public class Player
     String name;
     int steinAnzahl;
     OrbitoStoneColor color;
+
     boolean hasWon = false;
     /**
      * Konstruktor für Objekte der Klasse spieler
@@ -37,34 +38,8 @@ public class Player
         return name;
     }
 
-    void zug() {
-        // System.out.println(name + " ist am Zug."); //Ich muss noch was basteln was anzeigt wer dran ist
-        
-        // //while (!moved) {
-        // if (!(spiel.spieler[0].steinAnzahl == 8 && spiel.spieler[1].steinAnzahl == 8)) {
-                
-        // } 
-            //System.out.println("Möchtest du einen Stein deines Gegners bewegen? Gib seine Position ein oder schreibe 'skip'!");
-            //String pos = sc.nextLine();
-            //if (pos.equalsIgnoreCase("skip")) {
-                //moved = true;
-                //show = false;
-            //} else {
-                //moved = spielfeld.move(pos, color);
-            //}
-        //}
-        //*/
-        
-        // finishedPlacing=false;
-        // spiel.bildschirm.startPlacing(this);   
-        
+    public OrbitoStoneColor getColor() {
+        return color;
     }
-    
-    public void beendeZug() {
-        // this.steinAnzahl--;
-        // spielfeld.showBoard();
-        // spiel.bildschirm.showOrbitoKnopf();
-        //System.out.println("Gedrehtes Spielfeld:");
-        //
-    }
+
 }

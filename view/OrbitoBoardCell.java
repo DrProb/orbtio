@@ -1,6 +1,9 @@
 package view;
 
 import javax.swing.*;
+
+import model.OrbitoStoneColor;
+
 import java.awt.*;
 import java.awt.event.*;
 
@@ -9,23 +12,25 @@ public class OrbitoBoardCell extends JLabel {
 
     private int column;
     private int row;
-    private boolean enabled = false;
+    private OrbitoBoardCellStatus status = OrbitoBoardCellStatus.DISABLED;
+    private OrbitoBoardPane board;
 
-    public boolean occupied = false;
     private boolean hovered = false;
+    private OrbitoBoardCell myself;
 
     public OrbitoBoardCell(OrbitoBoardPane board, int column, int row) {
+        this.board = board;
         this.column = column;
         this.row = row;
-        this.enabled = true;
         this.setOpaque(false);
-        //this.setLayout(null);
+        myself = this;
 
         addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (!enabled) return;
+                if (status == OrbitoBoardCellStatus.DISABLED)
+                    return;
                 hovered = true;
                 repaint();
             }
@@ -35,57 +40,39 @@ public class OrbitoBoardCell extends JLabel {
                 hovered = false;
                 repaint();
             }
-            
+
             @Override
             public void mouseClicked(MouseEvent e) {
-                
-                if (enabled) {
-                    // if (bildschirm.modus == bildschirm.MODUS_MOVE) {
-                        // mouseClickedModusMove(e);
-                    // }
-                    // else if (bildschirm.modus == bildschirm.MODUS_PLACE) {
-                        mouseClickedModusPlace(e);
-                    // }
-                }
-            }
-            public void mouseClickedModusPlace(MouseEvent e) {
 
-                board.controller.placeStone(column, row);
-                    
-                    // if (bildschirm.amZug.spielfeld.spielfeld[y][x] == null) {
-                    //     hovered = false;
-                    //     stein stein = new stein(bildschirm.amZug.color);
-                    //     bildschirm.amZug.spielfeld.place(x, y, stein);
-                    //     bildschirm.amZug.hasMoved = false;
-                    //     bildschirm.amZug.beendeZug();
-                    // } else {
-                    //     bildschirm.moveStein(x,y);
-                    // }
-                    // //bildschirm.amZug.finishedPlacing = true;
-                    
-                
-            }
-            public void mouseClickedModusMove(MouseEvent e) {
-                    // spielbrett spielfeld = bildschirm.amZug.spielfeld;
-                    // if (y == bildschirm.moveY && x == bildschirm.moveX) { //Cancel move
-                    //     bildschirm.modus = bildschirm.MODUS_PLACE;
-                    // bildschirm.amZug.spielfeld.showBoard();
-                    // bildschirm.startPlacing(bildschirm.amZug);
-                    // return;
-                    // }
-                    
-                    // spielfeld.spielfeld[y][x] = spielfeld.spielfeld[bildschirm.moveY][bildschirm.moveX];
-                    
-                    // spielfeld.spielfeld[bildschirm.moveY][bildschirm.moveX] = null;
-                    // bildschirm.amZug.hasMoved = true;
-                    // bildschirm.modus = bildschirm.MODUS_PLACE;
-                    // bildschirm.amZug.spielfeld.showBoard();
-                    // bildschirm.startPlacing(bildschirm.amZug);
-                    // hovered = false;
-                    // //bildschirm.amZug.finishedPlacing = true;                    
+                System.out.println("Clicked cell " + column + ", " + row + " with status " + status);
+
+                switch (status) {
+                    case DISABLED:
+                        return;
+                    case PLACE_STONE:
+                        board.controller.placeStone(column, row);
+                        break;
+                    case MOVE_STONE_DESELECT_SOURCE:
+                        board.cancelMoveCell();
+                        break;
+                    case MOVE_STONE_SELECT_SOURCE:
+                        board.setMoveSourceCell(myself);
+                        break;
+                    case MOVE_STONE_TARGET:
+                        board.setMoveTargetCell(myself);
+                        break;
+                }
             }
         });
 
+    }
+
+    public OrbitoBoardCellStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(OrbitoBoardCellStatus status) {
+        this.status = status;
     }
 
     public int getColumn() {
@@ -96,56 +83,62 @@ public class OrbitoBoardCell extends JLabel {
         return row;
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
+        if (status == OrbitoBoardCellStatus.DISABLED) {
+            return;
+        }
+
         if (hovered) {
             Graphics2D g2 = (Graphics2D) g.create();
 
-            // transparente graue Fläche
-            if (true) { // bildschirm.modus == bildschirm.MODUS_MOVE) {
-                g2.setColor(new Color(255, 255, 0, 80));
-            } // else if ((bildschirm.modus == bildschirm.MODUS_PLACE && occupied) {
-              // g2.setColor(new Color(0, 0, 150, 80));
-              // }
-            else {
-                g2.setColor(new Color(150, 150, 150, 80));
-            }
-            // g2.setColor(new Color(150, 150, 150, 80));
-            if (occupied) {
-                g2.setColor(new Color(0, 0, 255, 80));
+            // fill cell with semi-transparent color based on status
+            switch (status) {
+                case PLACE_STONE:
+                    g2.setColor(new Color(150, 150, 150, 80));
+                    break;
+                case MOVE_STONE_SELECT_SOURCE:
+                    g2.setColor(new Color(0, 255, 0, 80));
+                    break;
+                case MOVE_STONE_DESELECT_SOURCE:
+                    g2.setColor(new Color(0, 0, 255, 80));
+                    break;
+                case MOVE_STONE_TARGET:
+                    g2.setColor(new Color(255, 255, 0, 80));
+                    break;
+                case DISABLED:
             }
             g2.fillRect(0, 0, getWidth(), getHeight());
 
-            // undurchsichtige graue Border
-            if (true) { // bildschirm.modus == bildschirm.MODUS_MOVE) {
-                g2.setColor(new Color(255, 255, 0));
-            } // else if (bildschirm.modus == bildschirm.MODUS_PLACE && occupied) {
-              // g2.setColor(new Color(0, 0, 120));
-              // }
-            else {
-                g2.setColor(new Color(120, 120, 120));
+            // draw opaque border based on status
+            // switch (status) {
+            //     case PLACE_STONE:
+            //         g2.setColor(new Color(120, 120, 120));
+            //         break;
+            //     case MOVE_STONE_SELECT_SOURCE:
+            //         g2.setColor(new Color(0, 255, 0));
+            //         break;
+            //     case MOVE_STONE_DESELECT_SOURCE:
+            //         g2.setColor(new Color(0, 0, 255));
+            //         break;
+            //     case MOVE_STONE_TARGET:
+            //         g2.setColor(new Color(255, 255, 0));
+            //         break;
+            //     case DISABLED:
+            // }
+            // set boarder color based on player color - better usability than status-based color for border
+            if(board.model.getCurrentPlayer().getColor() == OrbitoStoneColor.WHITE) {
+                g2.setColor(new Color(255, 255, 255));
+            } else {
+                g2.setColor(new Color(0, 0, 0));
             }
-            if (occupied) {
-                g2.setColor(new Color(0, 0, 255, 80));
-            }
-            // g2.setColor(new Color(120, 120, 120)); // voll opaque
-            g2.setStroke(new BasicStroke(2)); // Border-Dicke
+            g2.setStroke(new BasicStroke(2));
             g2.drawRect(1, 1, getWidth() - 3, getHeight() - 3);
 
             g2.dispose();
         }
     }
-
-    
 
 }

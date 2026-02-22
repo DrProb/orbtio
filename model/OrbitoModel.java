@@ -6,16 +6,24 @@ public class OrbitoModel {
     int currentPlayerIdx = 0;
     boolean currentPlayerHasMoved = false;
     boolean outOfStones = false;
-    int outOfStonesOrbitoButtonCounter = 0;
+    int outOfStonesOrbitoButtonCounter = 5;
+
     private java.util.List<OrbitoModelListener> modelListeners = new java.util.ArrayList<>();
-    private boolean gameEnded = false;
-    private OrbitoModelStatus status = OrbitoModelStatus.PLAYER_PLACE_STONE;
+    private boolean gameHasWinner = false;
+    private OrbitoModelStatus status = OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE;
 
     public OrbitoModel() {
         this.board = new OrbitoStone[4][4];
         this.player = new Player[2];
         player[0] = new Player("Spieler 1", OrbitoStoneColor.WHITE);
         player[1] = new Player("Spieler 2", OrbitoStoneColor.BLACK);
+    }
+
+    private OrbitoModelStatus setModelStatus(OrbitoModelStatus status) {
+        // System.out.println("Status changed to: " + status + " (previous: " +
+        // this.status + ")");
+        this.status = status;
+        return status;
     }
 
     public OrbitoModelStatus getStatus() {
@@ -26,25 +34,28 @@ public class OrbitoModel {
         modelListeners.add(listener);
     }
 
-    void notifyBoardChanged() {
-        OrbitoBoardChangedEvent event = new OrbitoBoardChangedEvent(this);
-        for (OrbitoModelListener listener : modelListeners) {
-            listener.boardChanged(event);
-        }
-    }
-
-    void notifyGameEnded() {
-        OrbitoGameEndedEvent event = new OrbitoGameEndedEvent(this);
-        for (OrbitoModelListener listener : modelListeners) {
-            listener.gameEnded(event);
-        }
-    }
-
     public Player getCurrentPlayer() {
         return player[currentPlayerIdx];
     }
 
+    public boolean isOutOfStones() {
+        return outOfStones;
+    }
+
+    public void setOutOfStones(boolean outOfStones) {
+        this.outOfStones = outOfStones;
+    }
+
+    public int getOutOfStonesOrbitoButtonCounter() {
+        return outOfStonesOrbitoButtonCounter;
+    }
+
     public void placeStone(int x, int y) {
+        if (status != OrbitoModelStatus.PLAYER_PLACE_STONE && status != OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE) {
+            throw new IllegalArgumentException(
+                    "Invalid status for placing stone! Expected: " + OrbitoModelStatus.PLAYER_PLACE_STONE + " or "
+                            + OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE + ", Got: " + status);
+        }
         if (x < 0 || x > 3 || y < 0 || y > 3 || board[x][y] != null) {
             throw new IllegalArgumentException("Invalid Position!");
         }
@@ -56,7 +67,7 @@ public class OrbitoModel {
         }
         board[x][y] = getCurrentPlayer().getStone();
         currentPlayerHasMoved = true;
-        status = OrbitoModelStatus.PUSH_ORBITO_BUTTON;
+        setModelStatus(OrbitoModelStatus.PUSH_ORBITO_BUTTON);
         notifyBoardChanged();
     }
 
@@ -72,7 +83,8 @@ public class OrbitoModel {
 
     public void pushOrbitoButton() {
         if (status != OrbitoModelStatus.PUSH_ORBITO_BUTTON) {
-            throw new IllegalArgumentException("Invalid status for pushing Orbito button! Expected: " + OrbitoModelStatus.PUSH_ORBITO_BUTTON + ", Got: " + status);
+            throw new IllegalArgumentException("Invalid status for pushing Orbito button! Expected: "
+                    + OrbitoModelStatus.PUSH_ORBITO_BUTTON + ", Got: " + status);
         }
 
         if (!outOfStones && !currentPlayerHasMoved) {
@@ -108,34 +120,79 @@ public class OrbitoModel {
 
         currentPlayerIdx = (currentPlayerIdx + 1) % 2;
         currentPlayerHasMoved = false;
-        status = OrbitoModelStatus.PLAYER_PLACE_STONE;
-        notifyBoardChanged();
+        setModelStatus(OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE);
+        // notifyBoardChanged();
         checkForFourInARow();
 
+        if (gameHasWinner) {
+            notifyBoardChanged();
+            return;
+        }
+
         if (!outOfStones) {
-            checkForNoMoreStones();
+            updateOutOfStones();
         } else {
-            outOfStonesOrbitoButtonCounter++;
-            if (outOfStonesOrbitoButtonCounter == 5) {
-                status = OrbitoModelStatus.GAME_ENDED_NO_STONES_LEFT;
+            setModelStatus(OrbitoModelStatus.PUSH_ORBITO_BUTTON);
+            outOfStonesOrbitoButtonCounter--;
+            if (outOfStonesOrbitoButtonCounter == 0) {
+                setModelStatus(OrbitoModelStatus.GAME_ENDED_NO_STONES_LEFT);
                 notifyGameEnded();
             }
+        }
+
+        notifyBoardChanged();
+    }
+
+    public void moveStone(int startColumn, int startRow, int targetColumn, int targetRow) {
+        if (status != OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE) {
+            throw new IllegalArgumentException("Invalid status for moving stone! Expected: "
+                    + OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE + ", Got: " + status);
+        }
+        if (startColumn < 0 || startColumn > 3 || startRow < 0 || startRow > 3 ||
+                targetColumn < 0 || targetColumn > 3 || targetRow < 0 || targetRow > 3) {
+            throw new IllegalArgumentException("Invalid Position!");
+        }
+        if (board[startColumn][startRow] == null) {
+            throw new IllegalArgumentException("No stone at start position!");
+        }
+        if (board[startColumn][startRow].getPlayer() == getCurrentPlayer()) {
+            throw new IllegalArgumentException("You can only move opponent's stones!");
+        }
+        if (board[targetColumn][targetRow] != null) {
+            throw new IllegalArgumentException("Target cell is already occupied!");
+        }
+        if (Math.abs(startColumn - targetColumn) + Math.abs(startRow - targetRow) != 1) {
+            throw new IllegalArgumentException("You can only move to adjacent cells!");
+        }
+        setModelStatus(OrbitoModelStatus.PLAYER_PLACE_STONE);
+        board[targetColumn][targetRow] = board[startColumn][startRow];
+        board[startColumn][startRow] = null;
+        notifyBoardChanged();
+    }
+
+    void notifyBoardChanged() {
+        OrbitoBoardChangedEvent event = new OrbitoBoardChangedEvent(this);
+        for (OrbitoModelListener listener : modelListeners) {
+            listener.boardChanged(event);
+        }
+    }
+
+    void notifyGameEnded() {
+        OrbitoGameEndedEvent event = new OrbitoGameEndedEvent(this);
+        for (OrbitoModelListener listener : modelListeners) {
+            listener.gameEnded(event);
         }
     }
 
     void setWinner(Player winner) {
-        gameEnded = true;
-        if(status != OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON) {
-            status = OrbitoModelStatus.GAME_ENDED_SINGLE_PAYER_WON;
-        } else {
-            status = OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON;
-        }
+        gameHasWinner = true;
         winner.setHasWon(true);
     }
 
-    void checkForNoMoreStones() {
+    void updateOutOfStones() {
         if (getCurrentPlayer().steinAnzahl == 0) {
             outOfStones = true;
+            setModelStatus(OrbitoModelStatus.PUSH_ORBITO_BUTTON);
         }
     }
 
@@ -211,7 +268,12 @@ public class OrbitoModel {
             }
         }
 
-        if (gameEnded) {
+        if (gameHasWinner) {
+            if (player[0].getHasWon() && player[1].getHasWon() ) {
+                setModelStatus(OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON);
+            } else {
+                setModelStatus(OrbitoModelStatus.GAME_ENDED_SINGLE_PAYER_WON);
+            }
             notifyGameEnded();
         }
 
@@ -220,76 +282,4 @@ public class OrbitoModel {
     public Player[] getPlayers() {
         return player;
     }
-    /*
-     * int[] parsePos(String pos) {
-     * if (pos.length()!=2) {
-     * System.out.println("Ungültige Eingabe, versuche es erneut!");
-     * return null;
-     * }
-     * int clm = Character.toUpperCase(pos.charAt(0)) - 'A';
-     * int row = pos.charAt(1) - '1';
-     * if (row < 0 || row > 3 || clm < 0 || clm > 3) {
-     * System.out.println("Dieses Feld existiert nicht, versuche es erneut!");
-     * return null;
-     * }
-     * return new int[] {row,clm};
-     * }
-     * private int[] getDirOffset(String dir) {
-     * switch (dir) {
-     * case "l":
-     * return new int [] {0, -1};
-     * case "r":
-     * return new int [] {0, 1};
-     * case "u":
-     * return new int [] {-1, 0};
-     * case "d":
-     * return new int [] {1, 0};
-     * default:
-     * System.out.print("Ungültige Eingabe - Versuche es erneut!");
-     * return null;
-     * }
-     * }
-     * public boolean move(String pos, String color) {
-     * int[] p = parsePos(pos);
-     * if (p==null) {
-     * return false;
-     * }
-     * int row = p[0];
-     * int clm = p[1];
-     * if (board[row][clm] == null) {
-     * System.out.println("Hier ist kein Stein! Gib ein anderes Feld ein!");
-     * return false;
-     * }
-     * if (board[row][clm].color == color) {
-     * System.out.
-     * println("Du kannst nur Figuren deines Gegners bewegen! Gib ein anderes Feld ein!"
-     * );
-     * return false;
-     * }
-     * while (true) {
-     * System.out.
-     * println("In welche Richtung möchtest du den Stein bewegen? (l / r / u / d / exit)"
-     * );
-     * String dir = sc.nextLine();
-     * if (dir == "exit") {
-     * return false;
-     * }
-     * int[] o = getDirOffset(dir);
-     * int rowO = o[0];
-     * int clmO = o[1];
-     * try {
-     * if (board[row+rowO][clm+clmO] != null) {
-     * System.out.println("Dieses Feld ist belegt!");
-     * break;
-     * }
-     * board[row+rowO][clm+clmO] = board[row][clm];
-     * board[row][clm] = null;
-     * return true;
-     * } catch (Exception ArrayIndexOutOfBoundsException) {
-     * System.out.println("Du kannst die Steine nicht aus dem Feld rausverschieben!"
-     * );
-     * }
-     * }
-     * return true;
-     * }
-     */}
+}

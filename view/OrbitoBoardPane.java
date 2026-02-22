@@ -33,9 +33,11 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
     private Image boardImage;
     private OrbitoBoardCell cells[][] = new OrbitoBoardCell[4][4];
     private OrbitoStoneLabel stones[][] = new OrbitoStoneLabel[4][4];
+    private OrbitoBoardCell moveSourceCell = null;
+    private OrbitoBoardPaneStatus status = OrbitoBoardPaneStatus.NORMAL;
 
     OrbitoController controller;
-    private OrbitoModel model;
+    OrbitoModel model;
 
     public OrbitoBoardPane(OrbitoController controller) {
         this.controller = controller;
@@ -60,7 +62,7 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
         add(turnButtonLabel, LAYER_TURN_BUTTON);
 
         updateCellStates();
-        updateTurnButton() ;
+        updateTurnButton();
 
         addComponentListener(new ComponentAdapter() {
             @Override
@@ -70,18 +72,60 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
         });
     }
 
-    private void setCellState(OrbitoBoardCell orbitoBoardCell) {
-        OrbitoStone[][] board = model.getBoard();
+    public OrbitoBoardPaneStatus getStatus() {
+        return status;
+    }
 
-        if(model.getStatus() == OrbitoModelStatus.PLAYER_PLACE_STONE) {
-            if (board[orbitoBoardCell.getColumn()][orbitoBoardCell.getRow()] == null) {
-                orbitoBoardCell.setEnabled(true);
+    private void setCellState(OrbitoBoardCell orbitoBoardCell) {
+        if (status == OrbitoBoardPaneStatus.SELECT_MOVE_TARGET) {
+            setCellStateSelectMoveTarget(orbitoBoardCell);
+        } else {
+            setCellStateNormal(orbitoBoardCell);
+        }
+    }
+
+    private void setCellStateNormal(OrbitoBoardCell orbitoBoardCell) {
+        OrbitoStone[][] board = model.getBoard();
+        OrbitoModelStatus modelStatus = model.getStatus();
+
+        if (modelStatus == OrbitoModelStatus.PLAYER_PLACE_STONE
+                || modelStatus == OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE) {
+            OrbitoStone stoneInCell = board[orbitoBoardCell.getColumn()][orbitoBoardCell.getRow()];
+            if (stoneInCell == null) {
+                orbitoBoardCell.setStatus(OrbitoBoardCellStatus.PLACE_STONE);
+            } else if (stoneInCell.getPlayer() != model.getCurrentPlayer()
+                    && emptyNeighboringCellExists(orbitoBoardCell)
+                    && modelStatus == OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE) {
+                orbitoBoardCell.setStatus(OrbitoBoardCellStatus.MOVE_STONE_SELECT_SOURCE);
             } else {
-                orbitoBoardCell.setEnabled(false);
+                orbitoBoardCell.setStatus(OrbitoBoardCellStatus.DISABLED);
             }
         } else {
-            orbitoBoardCell.setEnabled(false);
+            orbitoBoardCell.setStatus(OrbitoBoardCellStatus.DISABLED);
         }
+    }
+
+    private void setCellStateSelectMoveTarget(OrbitoBoardCell orbitoBoardCell) {
+        OrbitoStone[][] board = model.getBoard();
+
+        if (model.getStatus() == OrbitoModelStatus.PLAYER_PLACE_STONE
+                || model.getStatus() == OrbitoModelStatus.PLAYER_MOVE_OR_PLACE_STONE) {
+            OrbitoStone stoneInCell = board[orbitoBoardCell.getColumn()][orbitoBoardCell.getRow()];
+            if (stoneInCell == null && isNeighborOfMoveSource(orbitoBoardCell)) {
+                orbitoBoardCell.setStatus(OrbitoBoardCellStatus.MOVE_STONE_TARGET);
+            } else if (orbitoBoardCell == moveSourceCell) {
+                orbitoBoardCell.setStatus(OrbitoBoardCellStatus.MOVE_STONE_DESELECT_SOURCE);
+            } else {
+                orbitoBoardCell.setStatus(OrbitoBoardCellStatus.DISABLED);
+            }
+        } else {
+            orbitoBoardCell.setStatus(OrbitoBoardCellStatus.DISABLED);
+        }
+    }
+
+    private boolean isNeighborOfMoveSource(OrbitoBoardCell orbitoBoardCell) {
+        return Math.abs(orbitoBoardCell.getColumn() - moveSourceCell.getColumn())
+                + Math.abs(orbitoBoardCell.getRow() - moveSourceCell.getRow()) == 1;
     }
 
     public void scaleAndPlaceAllControls() {
@@ -91,7 +135,7 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
         double scaleY = (double) getHeight() / VIRTUEL_BOARD_PANEL_HEIGHT;
         double scale = Math.min(scaleX, scaleY);
 
-        System.out.println("Board image updated with scale: " + scale);
+        //System.out.println("Board image updated with scale: " + scale);
 
         // display boardLabel
         boardLabel.setBounds(0, 0, (int) (1000 * scale), (int) (1000 * scale));
@@ -114,8 +158,53 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
 
         turnButtonLabel.setBounds((int) (455 * scale), (int) (450 * scale), (int) (100 * scale),
                 (int) (100 * scale));
-        //revalidate();
-        //repaint();
+        // revalidate();
+        // repaint();
+    }
+
+    void setMoveSourceCell(OrbitoBoardCell orbitoBoardCell) {
+        // this is called from OrbitoBoardCell when a cell is clicked in MOVE_STONE mode
+        // we need to switch to PLACE_STONE mode and remember the source cell for the
+        // move
+        moveSourceCell = orbitoBoardCell;
+        moveSourceCell.setStatus(OrbitoBoardCellStatus.MOVE_STONE_DESELECT_SOURCE);
+        moveSourceCell.repaint();
+        status = OrbitoBoardPaneStatus.SELECT_MOVE_TARGET;
+        updateCellStates();
+    }
+
+    void setMoveTargetCell(OrbitoBoardCell targetCell) {
+        OrbitoBoardCell sourceCell = moveSourceCell;
+        status = OrbitoBoardPaneStatus.NORMAL;
+        moveSourceCell = null;
+
+        controller.moveStone(sourceCell.getColumn(), sourceCell.getRow(), targetCell.getColumn(), targetCell.getRow());
+        // updateCellStates(); // will be called from boardChanged after the move is
+        // executed
+    }
+
+    void cancelMoveCell() {
+        status = OrbitoBoardPaneStatus.NORMAL;
+        moveSourceCell.setStatus(OrbitoBoardCellStatus.MOVE_STONE_SELECT_SOURCE);
+        moveSourceCell.repaint();
+        moveSourceCell = null;
+        updateCellStates();
+    }
+
+    private boolean emptyNeighboringCellExists(OrbitoBoardCell orbitoBoardCell) {
+        OrbitoStone[][] board = model.getBoard();
+        int col = orbitoBoardCell.getColumn();
+        int row = orbitoBoardCell.getRow();
+        // Check all 4 neighboring cells (up, down, left, right)
+        if (col > 0 && board[col - 1][row] == null)
+            return true;
+        if (col < 3 && board[col + 1][row] == null)
+            return true;
+        if (row > 0 && board[col][row - 1] == null)
+            return true;
+        if (row < 3 && board[col][row + 1] == null)
+            return true;
+        return false;
     }
 
     private void updateCellStates() {
@@ -124,7 +213,7 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
                 setCellState(cells[i][j]);
             }
         }
-    }            
+    }
 
     private void updateStones() {
         OrbitoStone[][] board = model.getBoard();
@@ -142,7 +231,7 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
         }
     }
 
-    private void updateTurnButton() {  
+    private void updateTurnButton() {
         if (model.getStatus() == OrbitoModelStatus.PUSH_ORBITO_BUTTON) {
             turnButtonLabel.setVisible(true);
         } else {
@@ -160,7 +249,7 @@ public class OrbitoBoardPane extends JLayeredPane implements OrbitoModelListener
         updateCellStates();
         updateTurnButton();
         scaleAndPlaceAllControls();
-    }    
+    }
 
     @Override
     public void gameEnded(OrbitoGameEndedEvent e) {

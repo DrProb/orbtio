@@ -49,7 +49,8 @@ public class OrbitoGUI implements OrbitoModelListener {
         int boardSize = (int) (frame.getHeight() * 0.9);
         boardPanel.setBounds((frame.getWidth() - boardSize) / 2, (frame.getHeight() - boardSize) / 2, boardSize,
                 boardSize);
-        statusLabel.setBounds((int)((frame.getWidth() - boardSize) / 2 + boardSize*0.1), 0, boardSize, (int) (boardSize * 0.09));
+        statusLabel.setBounds((int) ((frame.getWidth() - boardSize) / 2 + boardSize * 0.1), 0, boardSize,
+                (int) (boardSize * 0.09));
     }
 
     private void updateStatusLabel() {
@@ -63,7 +64,13 @@ public class OrbitoGUI implements OrbitoModelListener {
                 text = String.format("%s: You must place a stone on the board", model.getCurrentPlayer().getName());
                 break;
             case PUSH_ORBITO_BUTTON:
-                text = "Push the Orbito Button!";
+                if (model.isOutOfStones()) {
+                    text = String.format("Board is full! Orbito Button must be finally pressed %d times!",
+                            model.getOutOfStonesOrbitoButtonCounter());
+                } else {
+                    text = String.format("%s: You must push the Orbito Button!", model.getCurrentPlayer().getName());
+                }
+                // text = "Push the Orbito Button!";
                 break;
             case GAME_ENDED_SINGLE_PAYER_WON:
                 for (Player p : model.getPlayers()) {
@@ -76,7 +83,7 @@ public class OrbitoGUI implements OrbitoModelListener {
                 text = "Both players have won!";
                 break;
             case GAME_ENDED_NO_STONES_LEFT:
-                text = "Game ended in a draw! No stones left!";
+                text = "Game ended in a draw! No winner after 5 final pushes!";
                 break;
             default:
                 text = model.getStatus().toString();
