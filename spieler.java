@@ -27,7 +27,7 @@ public class spieler
         this.color = color;
     }
     void zug() {
-        System.out.println(name + " ist am Zug."); //Ich muss noch was basteln was anzeigt wer dran ist
+        //System.out.println(name + " ist am Zug."); //Ich muss noch was basteln was anzeigt wer dran ist
         
         //while (!moved) {
         if (!(spiel.spieler[0].steinAnzahl == 8 && spiel.spieler[1].steinAnzahl == 8)) {
