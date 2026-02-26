@@ -14,6 +14,8 @@ public class OrbitoGUI implements OrbitoModelListener {
     JFrame frame;
     OrbitoBoardPane boardPanel;
     JLabel statusLabel;
+    OrbitoPlayerPanel player1Panel;
+    OrbitoPlayerPanel player2Panel;
 
     public OrbitoGUI(OrbitoController controller) {
         this.controller = controller;
@@ -33,6 +35,13 @@ public class OrbitoGUI implements OrbitoModelListener {
         boardPanel = new OrbitoBoardPane(controller);
         frame.add(boardPanel);
 
+        // Create player panels
+        Player[] players = model.getPlayers();
+        player1Panel = new OrbitoPlayerPanel(players[0], model);
+        player2Panel = new OrbitoPlayerPanel(players[1], model);
+        frame.add(player1Panel);
+        frame.add(player2Panel);
+
         frame.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent e) {
@@ -47,10 +56,27 @@ public class OrbitoGUI implements OrbitoModelListener {
 
     private void resizeFrame() {
         int boardSize = (int) (frame.getHeight() * 0.9);
-        boardPanel.setBounds((frame.getWidth() - boardSize) / 2, (frame.getHeight() - boardSize) / 2, boardSize,
-                boardSize);
-        statusLabel.setBounds((int) ((frame.getWidth() - boardSize) / 2 + boardSize * 0.1), 0, boardSize,
-                (int) (boardSize * 0.09));
+        int boardX = (frame.getWidth() - boardSize) / 2;
+        int boardY = (frame.getHeight() - boardSize) / 2;
+        
+        boardPanel.setBounds(boardX, boardY, boardSize, boardSize);
+        statusLabel.setBounds((int) (boardX + boardSize * 0.1), 0, boardSize, (int) (boardSize * 0.09));
+        
+        // Calculate player panel dimensions (based on original PlayerPanel)
+        int panelWidth = (int) ((frame.getWidth() - boardSize - 40.0) / 2.0);
+        int panelHeight = (int) ((panelWidth / 1202.0) * 788.0);
+        
+        // Position player 1 panel (left side, White player)
+        int player1X = 20;
+        int player1Y = boardY;
+        player1Panel.setBounds(player1X, player1Y, panelWidth, panelHeight);
+        player1Panel.updateSize(panelWidth, panelHeight);
+        
+        // Position player 2 panel (right side, Black player)
+        int player2X = boardX + boardSize + 20;
+        int player2Y = boardY;
+        player2Panel.setBounds(player2X, player2Y, panelWidth, panelHeight);
+        player2Panel.updateSize(panelWidth, panelHeight);
     }
 
     private void updateStatusLabel() {
