@@ -87,10 +87,8 @@ public class OrbitoPlayerPanel extends JPanel implements OrbitoModelListener {
         // Update font size dynamically
         updateNameLabelFont();
         
-        // Update turn indicator position if visible
-        if (turnIndicatorLabel != null) {
-            updateTurnIndicatorPosition();
-        }
+        // Update turn indicator (not just position, but recreate it with proper size)
+        updateTurnIndicator();
         
         // Update trophy position if visible
         if (trophyLabel != null) {
@@ -143,6 +141,12 @@ public class OrbitoPlayerPanel extends JPanel implements OrbitoModelListener {
             ImageIcon turnIcon = new ImageIcon("resources/TurnIndicator_" + colorSuffix + ".png");
             turnIndicatorLabel = new JLabel(turnIcon);
             add(turnIndicatorLabel);
+            
+            // Ensure turn indicator is on top
+            setComponentZOrder(turnIndicatorLabel, 0);
+            setComponentZOrder(nameLabel, 1);
+            setComponentZOrder(backgroundLabel, 2);
+            
             updateTurnIndicatorPosition();
         }
         
@@ -151,10 +155,10 @@ public class OrbitoPlayerPanel extends JPanel implements OrbitoModelListener {
     }
     
     private void updateTurnIndicatorPosition() {
-        if (turnIndicatorLabel == null || panelWidth == 0) return;
+        if (turnIndicatorLabel == null || panelWidth == 0 || panelHeight == 0) return;
         
         // Position based on original PlayerPanel logic (ratio 167/207)
-        double indicatorWidth = panelWidth / 4.0;
+        double indicatorWidth = panelWidth / 3.5;
         double indicatorHeight = indicatorWidth * (167.0 / 207.0);
         
         // Scale the icon
@@ -164,14 +168,19 @@ public class OrbitoPlayerPanel extends JPanel implements OrbitoModelListener {
         turnIndicatorLabel.setIcon(new ImageIcon(scaledImage));
         
         // Position: for white player on right, for black player on left
+        // Keep indicator FULLY within panel bounds
         int x;
+        int y = (int)(panelHeight * 0.25); // Position in middle area vertically
+        
         if (player.getColor() == OrbitoStoneColor.WHITE) {
-            x = (int)(panelWidth - (indicatorWidth / 2.0));
+            // Position on right edge, fully inside panel
+            x = (int)(panelWidth - indicatorWidth - 5);
         } else {
-            x = (int)(-(indicatorWidth / 2.0));
+            // Position on left edge, fully inside panel
+            x = 5;
         }
         
-        turnIndicatorLabel.setBounds(x, 46, (int)indicatorWidth, (int)indicatorHeight);
+        turnIndicatorLabel.setBounds(x, y, (int)indicatorWidth, (int)indicatorHeight);
     }
     
     private void updateTrophy() {
