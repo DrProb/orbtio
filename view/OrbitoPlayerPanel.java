@@ -27,13 +27,20 @@ public class OrbitoPlayerPanel extends JPanel implements OrbitoModelListener {
         String colorSuffix = player.getColor() == OrbitoStoneColor.WHITE ? "White" : "Black";
         ImageIcon backgroundIcon = new ImageIcon("resources/PlayerPanel_" + colorSuffix + ".png");
         backgroundLabel = new JLabel(backgroundIcon);
-        add(backgroundLabel);
         
         // Create name label with white text
         nameLabel = new JLabel(player.getName(), SwingConstants.CENTER);
         nameLabel.setForeground(Color.WHITE);
         nameLabel.setOpaque(false);
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 20)); // Initial font size
+        
+        // Add components in correct order (background first, then name on top)
+        add(backgroundLabel);
         add(nameLabel);
+        
+        // Ensure nameLabel is on top
+        setComponentZOrder(nameLabel, 0);
+        setComponentZOrder(backgroundLabel, 1);
         
         // Add mouse listener for name change
         addMouseListener(new MouseAdapter() {
