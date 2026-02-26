@@ -12,7 +12,6 @@ public class OrbitoPlayerPanel extends JPanel implements OrbitoModelListener {
     private JLabel backgroundLabel;
     private JLabel nameLabel;
     private JLabel turnIndicatorLabel;
-    private JLabel trophyLabel;
     private int panelWidth;
     private int panelHeight;
     
@@ -89,11 +88,6 @@ public class OrbitoPlayerPanel extends JPanel implements OrbitoModelListener {
         
         // Update turn indicator (not just position, but recreate it with proper size)
         updateTurnIndicator();
-        
-        // Update trophy position if visible
-        if (trophyLabel != null) {
-            updateTrophyPosition();
-        }
         
         revalidate();
         repaint();
@@ -183,71 +177,6 @@ public class OrbitoPlayerPanel extends JPanel implements OrbitoModelListener {
         turnIndicatorLabel.setBounds(x, y, (int)indicatorWidth, (int)indicatorHeight);
     }
     
-    private void updateTrophy() {
-        // Remove existing trophy
-        if (trophyLabel != null) {
-            remove(trophyLabel);
-            trophyLabel = null;
-        }
-        
-        // Check if player has won
-        if (player.getHasWon()) {
-            String imageName;
-            
-            // Check if both players won (draw)
-            if (model.getStatus() == OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON) {
-                String colorSuffix = player.getColor() == OrbitoStoneColor.WHITE ? "White" : "Black";
-                imageName = "resources/Trophy_" + colorSuffix + ".png";
-            } else {
-                // Single winner gets gold trophy
-                imageName = "resources/Trophy_Gold.png";
-            }
-            
-            ImageIcon trophyIcon = new ImageIcon(imageName);
-            trophyLabel = new JLabel(trophyIcon);
-            add(trophyLabel);
-            updateTrophyPosition();
-        }
-        
-        revalidate();
-        repaint();
-    }
-    
-    private void updateTrophyPosition() {
-        if (trophyLabel == null || panelWidth == 0 || panelHeight == 0) return;
-        
-        // Calculate trophy size (88% of space below panel)
-        JFrame frame = (JFrame)SwingUtilities.getWindowAncestor(this);
-        if (frame == null) return;
-        
-        int availableHeight = frame.getHeight() - panelHeight;
-        double trophyHeight = availableHeight * 0.88;
-        double trophyWidth;
-        
-        // Different ratios for gold vs colored trophy
-        if (model.getStatus() == OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON) {
-            trophyWidth = trophyHeight * (280.0 / 1318.0);
-        } else {
-            trophyWidth = trophyHeight * (561.0 / 1318.0);
-        }
-        
-        // Scale the icon
-        ImageIcon icon = (ImageIcon)trophyLabel.getIcon();
-        Image scaledImage = icon.getImage().getScaledInstance(
-            (int)trophyWidth, (int)trophyHeight, Image.SCALE_SMOOTH);
-        trophyLabel.setIcon(new ImageIcon(scaledImage));
-        
-        // Position below the panel
-        int x;
-        if (model.getStatus() == OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON) {
-            x = (int)(trophyWidth / 2.0);
-        } else {
-            x = 0;
-        }
-        int y = (int)(panelHeight * 1.025);
-        
-        trophyLabel.setBounds(x, y, (int)trophyWidth, (int)trophyHeight);
-    }
     
     @Override
     public void boardChanged(OrbitoBoardChangedEvent e) {
@@ -257,6 +186,5 @@ public class OrbitoPlayerPanel extends JPanel implements OrbitoModelListener {
     @Override
     public void gameEnded(OrbitoGameEndedEvent e) {
         updateTurnIndicator();
-        updateTrophy();
     }
 }

@@ -16,6 +16,8 @@ public class OrbitoGUI implements OrbitoModelListener {
     JLabel statusLabel;
     OrbitoPlayerPanel player1Panel;
     OrbitoPlayerPanel player2Panel;
+    JLabel trophy1Label;
+    JLabel trophy2Label;
 
     public OrbitoGUI(OrbitoController controller) {
         this.controller = controller;
@@ -52,6 +54,9 @@ public class OrbitoGUI implements OrbitoModelListener {
         model.addBoardChangedListener(this);
 
         frame.setVisible(true);
+        
+        // Initial resize to set up trophies
+        resizeFrame();
     }
 
     private void resizeFrame() {
@@ -77,6 +82,9 @@ public class OrbitoGUI implements OrbitoModelListener {
         int player2Y = boardY;
         player2Panel.setBounds(player2X, player2Y, panelWidth, panelHeight);
         player2Panel.updateSize(panelWidth, panelHeight);
+        
+        // Update trophy positions if they exist
+        updateTrophyPositions(player1X, player1Y, player2X, player2Y, panelWidth, panelHeight);
     }
 
     private void updateStatusLabel() {
@@ -125,6 +133,97 @@ public class OrbitoGUI implements OrbitoModelListener {
     @Override
     public void gameEnded(OrbitoGameEndedEvent e) {
         updateStatusLabel();
+        updateTrophies();
+    }
+    
+    private void updateTrophies() {
+        // Remove existing trophies
+        if (trophy1Label != null) {
+            frame.remove(trophy1Label);
+            trophy1Label = null;
+        }
+        if (trophy2Label != null) {
+            frame.remove(trophy2Label);
+            trophy2Label = null;
+        }
+        
+        Player[] players = model.getPlayers();
+        
+        // Check if player 1 won
+        if (players[0].getHasWon()) {
+            String imageName;
+            if (model.getStatus() == OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON) {
+                imageName = "resources/Trophy_White.png";
+            } else {
+                imageName = "resources/Trophy_Gold.png";
+            }
+            trophy1Label = new JLabel(new ImageIcon(imageName));
+            frame.add(trophy1Label);
+        }
+        
+        // Check if player 2 won
+        if (players[1].getHasWon()) {
+            String imageName;
+            if (model.getStatus() == OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON) {
+                imageName = "resources/Trophy_Black.png";
+            } else {
+                imageName = "resources/Trophy_Gold.png";
+            }
+            trophy2Label = new JLabel(new ImageIcon(imageName));
+            frame.add(trophy2Label);
+        }
+        
+        // Force a resize to position the trophies
+        resizeFrame();
+        frame.revalidate();
+        frame.repaint();
+    }
+    
+    private void updateTrophyPositions(int player1X, int player1Y, int player2X, int player2Y, 
+                                       int panelWidth, int panelHeight) {
+        // Calculate available space below the panels
+        int availableHeight = frame.getHeight() - (player1Y + panelHeight) - 20; // 20px margin
+        
+        // Use 90% of available height for trophy
+        double trophyHeight = availableHeight * 0.9;
+        
+        // Update player 1 trophy
+        if (trophy1Label != null) {
+            double trophyWidth;
+            if (model.getStatus() == OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON) {
+                trophyWidth = trophyHeight * (280.0 / 1318.0);
+            } else {
+                trophyWidth = trophyHeight * (561.0 / 1318.0);
+            }
+            
+            ImageIcon icon = (ImageIcon)trophy1Label.getIcon();
+            java.awt.Image scaledImage = icon.getImage().getScaledInstance(
+                (int)trophyWidth, (int)trophyHeight, java.awt.Image.SCALE_SMOOTH);
+            trophy1Label.setIcon(new ImageIcon(scaledImage));
+            
+            int x = player1X + (panelWidth - (int)trophyWidth) / 2;
+            int y = player1Y + panelHeight + 10;
+            trophy1Label.setBounds(x, y, (int)trophyWidth, (int)trophyHeight);
+        }
+        
+        // Update player 2 trophy
+        if (trophy2Label != null) {
+            double trophyWidth;
+            if (model.getStatus() == OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON) {
+                trophyWidth = trophyHeight * (280.0 / 1318.0);
+            } else {
+                trophyWidth = trophyHeight * (561.0 / 1318.0);
+            }
+            
+            ImageIcon icon = (ImageIcon)trophy2Label.getIcon();
+            java.awt.Image scaledImage = icon.getImage().getScaledInstance(
+                (int)trophyWidth, (int)trophyHeight, java.awt.Image.SCALE_SMOOTH);
+            trophy2Label.setIcon(new ImageIcon(scaledImage));
+            
+            int x = player2X + (panelWidth - (int)trophyWidth) / 2;
+            int y = player2Y + panelHeight + 10;
+            trophy2Label.setBounds(x, y, (int)trophyWidth, (int)trophyHeight);
+        }
     }
 
 }
