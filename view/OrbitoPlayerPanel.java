@@ -137,9 +137,14 @@ public class OrbitoPlayerPanel extends JPanel implements OrbitoModelListener {
             add(turnIndicatorLabel);
             
             // Ensure turn indicator is on top
-            setComponentZOrder(turnIndicatorLabel, 0);
-            setComponentZOrder(nameLabel, 1);
-            setComponentZOrder(backgroundLabel, 2);
+            try {
+                setComponentZOrder(turnIndicatorLabel, 0);
+                setComponentZOrder(nameLabel, 1);
+                setComponentZOrder(backgroundLabel, 2);
+            } catch (IllegalArgumentException e) {
+                // Components may not be in the same container hierarchy yet
+                System.err.println("Warning: Could not set component Z-order: " + e.getMessage());
+            }
             
             updateTurnIndicatorPosition();
         }

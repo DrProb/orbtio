@@ -18,6 +18,8 @@ public class OrbitoGUI implements OrbitoModelListener {
     OrbitoPlayerPanel player2Panel;
     JLabel trophy1Label;
     JLabel trophy2Label;
+    JButton newGameButton;
+    ImageIcon originalNewGameIcon; // Store original icon to prevent double-scaling
 
     public OrbitoGUI(OrbitoController controller) {
         this.controller = controller;
@@ -43,6 +45,47 @@ public class OrbitoGUI implements OrbitoModelListener {
         player2Panel = new OrbitoPlayerPanel(players[1], model);
         frame.add(player1Panel);
         frame.add(player2Panel);
+
+        // Initialize new game button (initially hidden)
+        newGameButton = new JButton();
+        // Use JLabel instead of JButton for better control
+        JLabel tempButton = new JLabel();
+        try {
+            originalNewGameIcon = new ImageIcon("new.png");
+            if (originalNewGameIcon.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
+                tempButton.setIcon(originalNewGameIcon);
+                tempButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+                tempButton.setOpaque(false);
+                tempButton.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        controller.startNewGame();
+                    }
+                });
+            } else {
+                tempButton.setText("New Game");
+                tempButton.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 16));
+                tempButton.setOpaque(true);
+                tempButton.setBackground(java.awt.Color.LIGHT_GRAY);
+            }
+        } catch (Exception ex) {
+            tempButton.setText("New Game");
+            tempButton.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 16));
+            tempButton.setOpaque(true);
+            tempButton.setBackground(java.awt.Color.LIGHT_GRAY);
+        }
+        newGameButton = new JButton(); // Keep as JButton type but copy from label
+        newGameButton.setIcon(tempButton.getIcon());
+        newGameButton.setText(tempButton.getText());
+        newGameButton.setFont(tempButton.getFont());
+        newGameButton.setBorderPainted(false);
+        newGameButton.setContentAreaFilled(false);
+        newGameButton.setFocusPainted(false);
+        newGameButton.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        newGameButton.setOpaque(false);
+        newGameButton.addActionListener(e -> controller.startNewGame());
+        newGameButton.setVisible(false); // Start hidden, show only when game ends
+        frame.getLayeredPane().add(newGameButton, JLayeredPane.MODAL_LAYER);
 
         frame.addComponentListener(new ComponentAdapter() {
             @Override
@@ -82,6 +125,29 @@ public class OrbitoGUI implements OrbitoModelListener {
         int player2Y = boardY;
         player2Panel.setBounds(player2X, player2Y, panelWidth, panelHeight);
         player2Panel.updateSize(panelWidth, panelHeight);
+        
+        // Position new game button (centered, overlaying the board)
+        if (newGameButton != null && originalNewGameIcon != null) {
+            // Scale the button to fit in the center of the board
+            double scale = 0.25; // Scale to 25% of original size
+            int buttonWidth = (int)(originalNewGameIcon.getIconWidth() * scale);
+            int buttonHeight = (int)(originalNewGameIcon.getIconHeight() * scale);
+            
+            // Position centered on the board
+            int buttonX = boardX + (boardSize - buttonWidth) / 2;
+            int buttonY = boardY + (boardSize - buttonHeight) / 2;
+            
+            // Scale the icon from the ORIGINAL to prevent double-scaling
+            java.awt.Image scaledImage = originalNewGameIcon.getImage().getScaledInstance(
+                buttonWidth, buttonHeight, java.awt.Image.SCALE_SMOOTH);
+            newGameButton.setIcon(new ImageIcon(scaledImage));
+            
+            newGameButton.setBounds(buttonX, buttonY, buttonWidth, buttonHeight);
+        } else if (newGameButton != null) {
+            // Fallback for text button - center on board
+            int buttonY = boardY + (boardSize - 40) / 2;
+            newGameButton.setBounds(boardX + (boardSize - 150) / 2, buttonY, 150, 40);
+        }
         
         // Update trophy positions if they exist
         updateTrophyPositions(player1X, player1Y, player2X, player2Y, panelWidth, panelHeight);
@@ -128,12 +194,47 @@ public class OrbitoGUI implements OrbitoModelListener {
     @Override
     public void boardChanged(OrbitoBoardChangedEvent e) {
         updateStatusLabel();
+        
+        // Hide the button only if the game is NOT in an ended state
+        // (to prevent hiding it after gameEnded() when there's a final board change)
+        OrbitoModelStatus status = model.getStatus();
+        boolean isGameEnded = (status == OrbitoModelStatus.GAME_ENDED_SINGLE_PAYER_WON ||
+                              status == OrbitoModelStatus.GAME_ENDED_BOTH_PLAYERS_WON ||
+                              status == OrbitoModelStatus.GAME_ENDED_NO_STONES_LEFT);
+        
+        if (newGameButton != null && newGameButton.isVisible() && !isGameEnded) {
+            newGameButton.setVisible(false);
+        }
+        
+        // Remove trophies when a new game starts (game is no longer in ended state)
+        if (!isGameEnded && (trophy1Label != null || trophy2Label != null)) {
+            if (trophy1Label != null) {
+                frame.remove(trophy1Label);
+                trophy1Label = null;
+            }
+            if (trophy2Label != null) {
+                frame.remove(trophy2Label);
+                trophy2Label = null;
+            }
+            frame.revalidate();
+            frame.repaint();
+        }
     }
 
     @Override
     public void gameEnded(OrbitoGameEndedEvent e) {
         updateStatusLabel();
         updateTrophies();
+        
+        // Show the new game button when the game ends
+        if (newGameButton != null) {
+            newGameButton.setVisible(true);
+            frame.getLayeredPane().moveToFront(newGameButton);
+            newGameButton.repaint();
+            frame.getLayeredPane().repaint();
+        }
+        frame.revalidate();
+        frame.repaint();
     }
     
     private void updateTrophies() {

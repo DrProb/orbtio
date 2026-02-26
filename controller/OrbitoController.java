@@ -55,7 +55,7 @@ public class OrbitoController {
     }
     
     private void runTestsWithDelay() {
-        if (RUN_TESTS_ACTION_DELAY_MS > 0) {
+        if (RUN_TESTS && ( RUN_TESTS_ACTION_DELAY_MS > 0 ) ) {
             try {
                 Thread.sleep(RUN_TESTS_ACTION_DELAY_MS);
             } catch (InterruptedException e) {
